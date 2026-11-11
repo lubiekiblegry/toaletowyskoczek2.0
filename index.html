@@ -3,957 +3,764 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#14243b">
 <title>Toaletowy Skoczek 2.0</title>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    background: #14243b;
-    color: white;
-    touch-action: manipulation;
-}
-
-#game {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    height: 100vh;
-    overflow: hidden;
-    background: #80cfff;
-}
-
-#canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
-
-.screen {
-    position: absolute;
-    z-index: 10;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 13px;
-    padding: 20px;
-    text-align: center;
-    overflow-y: auto;
-    background: rgba(10,20,35,.90);
-}
-
-.hidden {
-    display: none !important;
-}
-
-h1 {
-    color: #ffe34c;
-    font-size: clamp(28px, 7vw, 55px);
-    text-shadow: 3px 4px 0 #65451b;
-}
-
-h2 {
-    font-size: clamp(23px, 6vw, 38px);
-}
-
-p {
-    line-height: 1.5;
-}
-
-select {
-    width: min(280px, 90%);
-    padding: 12px;
-    border: 2px solid white;
-    border-radius: 12px;
-    font-size: 16px;
-    background: white;
-    color: #17243a;
-}
-
-button {
-    min-width: 180px;
-    padding: 14px 20px;
-    border: 0;
-    border-radius: 14px;
-    background: #ffdb42;
-    color: #17243a;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 5px 0 #a77c14;
-}
-
-button:active {
-    transform: translateY(3px);
-    box-shadow: 0 2px 0 #a77c14;
-}
-
-button.secondary {
-    background: #e9f3ff;
-    box-shadow: 0 5px 0 #8296ac;
-}
-
-#hud {
-    position: absolute;
-    z-index: 5;
-    top: 12px;
-    left: 12px;
-    right: 12px;
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-    font-size: 17px;
-    font-weight: bold;
-    pointer-events: none;
-    text-shadow: 2px 2px 3px black;
-}
-
-.hudBox {
-    padding: 9px 12px;
-    border-radius: 12px;
-    background: rgba(0,0,0,.4);
-}
-
-#pauseButton {
-    position: absolute;
-    z-index: 6;
-    top: 62px;
-    right: 12px;
-    width: 48px;
-    min-width: 48px;
-    padding: 8px;
-    background: white;
-    box-shadow: 0 3px 0 #999;
-}
-
-#controls {
-    position: absolute;
-    z-index: 5;
-    left: 0;
-    right: 0;
-    bottom: 20px;
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-}
-
-#jumpButton {
-    width: 155px;
-    height: 70px;
-    border-radius: 50px;
-    font-size: 23px;
-    pointer-events: auto;
-}
-
-.small {
-    font-size: 13px;
-    opacity: .8;
-}
-
-#toast {
-    position: absolute;
-    z-index: 20;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 12px 18px;
-    background: rgba(0,0,0,.8);
-    border-radius: 12px;
-    display: none;
-}
-
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Arial,sans-serif;background:#14243b;color:white;touch-action:manipulation}
+#game{position:relative;width:100%;height:100%;overflow:hidden;background:#80cfff}
+canvas{display:block;width:100%;height:100%}
+.screen{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:20px;text-align:center;overflow-y:auto;background:rgba(10,20,35,.91)}
+.hidden{display:none!important}
+h1{color:#ffe34c;font-size:clamp(28px,7vw,55px);text-shadow:3px 4px 0 #65451b}
+h2{font-size:clamp(23px,6vw,38px)}
+p{line-height:1.5}
+select{width:min(280px,90%);padding:12px;border:2px solid white;border-radius:12px;font-size:16px;background:white;color:#17243a}
+button{min-width:180px;padding:14px 20px;border:0;border-radius:14px;background:#ffdb42;color:#17243a;font-size:17px;font-weight:bold;cursor:pointer;box-shadow:0 5px 0 #a77c14}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #a77c14}
+.secondary{background:#e9f3ff;box-shadow:0 5px 0 #8296ac}
+#hud{position:absolute;z-index:5;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;font-size:17px;font-weight:bold;pointer-events:none;text-shadow:2px 2px 3px black}
+.hudBox{padding:9px 12px;border-radius:12px;background:rgba(0,0,0,.4)}
+#pauseButton{position:absolute;z-index:6;top:62px;right:12px;width:48px;min-width:48px;padding:8px;background:white;box-shadow:0 3px 0 #999}
+#controls{position:absolute;z-index:5;left:0;right:0;bottom:20px;display:flex;justify-content:center;pointer-events:none}
+#jumpButton{width:155px;height:70px;border-radius:50px;font-size:23px;pointer-events:auto}
+.small{font-size:13px;opacity:.8}
+#toast{position:absolute;z-index:20;top:20%;left:50%;transform:translateX(-50%);padding:12px 18px;background:rgba(0,0,0,.8);border-radius:12px;display:none}
 </style>
 </head>
 
 <body>
-
 <div id="game">
-
 <canvas id="canvas"></canvas>
 
 <div id="hud" class="hidden">
-    <div class="hudBox" id="scoreText">Punkty: 0</div>
-    <div class="hudBox" id="recordText">Rekord: 0</div>
+<div class="hudBox" id="scoreText">Punkty: 0</div>
+<div class="hudBox" id="recordText">Rekord: 0</div>
 </div>
 
 <button id="pauseButton" class="hidden">Ⅱ</button>
-
-<div id="controls" class="hidden">
-    <button id="jumpButton">SKOK!</button>
-</div>
-
+<div id="controls" class="hidden"><button id="jumpButton">SKOK!</button></div>
 <div id="toast"></div>
 
 <section id="menu" class="screen">
+<h1>🚽 TOALETOWY SKOCZEK 2.0</h1>
+<p>Przeskakuj kibelki i zostań mistrzem!</p>
 
-    <h1>🚽 TOALETOWY SKOCZEK</h1>
+<label for="language">🌍 Język</label>
+<select id="language">
+<option value="pl">Polski</option>
+<option value="en">English</option>
+<option value="de">Deutsch</option>
+<option value="es">Español</option>
+<option value="fr">Français</option>
+<option value="it">Italiano</option>
+<option value="pt">Português</option>
+<option value="nl">Nederlands</option>
+<option value="uk">Українська</option>
+<option value="cs">Čeština</option>
+<option value="ja">日本語</option>
+</select>
 
-    <p>Przeskakuj kibelki i zostań mistrzem!</p>
+<label for="city">🏙️ Miasto</label>
+<select id="city">
+<option value="warsaw">Warszawa</option>
+<option value="newyork">Nowy Jork</option>
+<option value="paris">Paryż</option>
+<option value="tokyo">Tokio</option>
+<option value="london">Londyn</option>
+<option value="dubai">Dubaj</option>
+<option value="rome">Rzym</option>
+<option value="rio">Rio de Janeiro</option>
+</select>
 
-    <label for="language">🌍 Język</label>
+<label for="weather">🌦️ Pogoda</label>
+<select id="weather">
+<option value="sun">☀️ Słonecznie</option>
+<option value="rain">🌧️ Deszcz</option>
+<option value="snow">❄️ Śnieg</option>
+<option value="fog">🌫️ Mgła</option>
+</select>
 
-    <select id="language">
-        <option value="pl">Polski</option>
-        <option value="en">English</option>
-        <option value="de">Deutsch</option>
-        <option value="es">Español</option>
-        <option value="fr">Français</option>
-        <option value="it">Italiano</option>
-        <option value="pt">Português</option>
-        <option value="nl">Nederlands</option>
-        <option value="uk">Українська</option>
-        <option value="cs">Čeština</option>
-        <option value="ja">日本語</option>
-    </select>
-
-    <label for="city">🏙️ Miasto</label>
-
-    <select id="city">
-        <option value="warsaw">Warszawa</option>
-        <option value="newyork">Nowy Jork</option>
-        <option value="paris">Paryż</option>
-        <option value="tokyo">Tokio</option>
-        <option value="london">Londyn</option>
-        <option value="dubai">Dubaj</option>
-        <option value="rome">Rzym</option>
-        <option value="rio">Rio de Janeiro</option>
-    </select>
-
-    <label for="weather">🌦️ Pogoda</label>
-
-    <select id="weather">
-        <option value="sun">☀️ Słonecznie</option>
-        <option value="rain">🌧️ Deszcz</option>
-        <option value="snow">❄️ Śnieg</option>
-        <option value="fog">🌫️ Mgła</option>
-    </select>
-
-    <button id="startButton">▶ ROZPOCZNIJ GRĘ</button>
-
-    <p class="small">Sterowanie: dotknij SKOK lub naciśnij SPACJĘ.</p>
-    <p class="small">Cel: zdobyć 1000 punktów!</p>
-
+<button id="startButton">▶ ROZPOCZNIJ GRĘ</button>
+<p class="small">Sterowanie: SKOK lub SPACJA.</p>
+<p class="small">Cel: zdobyć 1000 punktów!</p>
 </section>
 
 <section id="pauseScreen" class="screen hidden">
-    <h1>⏸️ PAUZA</h1>
-    <p>Gra została zatrzymana.</p>
-    <button id="continueButton">▶ KONTYNUUJ</button>
-    <button id="pauseMenuButton" class="secondary">MENU GŁÓWNE</button>
+<h1>⏸️ PAUZA</h1>
+<p>Gra została zatrzymana.</p>
+<button id="continueButton">▶ KONTYNUUJ</button>
+<button id="pauseMenuButton" class="secondary">MENU GŁÓWNE</button>
 </section>
 
 <section id="gameOver" class="screen hidden">
-    <h1>💥 KONIEC GRY!</h1>
-    <h2 id="finalScore">Wynik: 0</h2>
-    <p id="bestScore">Rekord: 0</p>
-    <button id="restartButton">🔄 ZAGRAJ PONOWNIE</button>
-    <button id="backButton" class="secondary">MENU GŁÓWNE</button>
+<h1>💥 KONIEC GRY!</h1>
+<h2 id="finalScore">Wynik: 0</h2>
+<p id="bestScore">Rekord: 0</p>
+<button id="restartButton">🔄 ZAGRAJ PONOWNIE</button>
+<button id="backButton" class="secondary">MENU GŁÓWNE</button>
 </section>
 
 <section id="victory" class="screen hidden">
-    <h1>🏆 WYGRAŁEŚ!</h1>
-    <h2>1000 PUNKTÓW!</h2>
-    <p>Jesteś legendą Toaletowego Skoczka!</p>
-    <button id="victoryRestart">🔄 ZAGRAJ PONOWNIE</button>
-    <button id="victoryMenu" class="secondary">MENU GŁÓWNE</button>
+<h1>🏆 WYGRAŁEŚ!</h1>
+<h2>1000 PUNKTÓW!</h2>
+<p>Jesteś legendą Toaletowego Skoczka!</p>
+<button id="victoryRestart">🔄 ZAGRAJ PONOWNIE</button>
+<button id="victoryMenu" class="secondary">MENU GŁÓWNE</button>
 </section>
-
 </div>
 
 <script>
-
-/* =================================
-   TOALETOWY SKOCZEK 2.0
-   SILNIK GRY
-================================= */
-
-(function() {
-
+(function(){
 "use strict";
 
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+var canvas=document.getElementById("canvas");
+var ctx=canvas.getContext("2d");
 
-var menu = document.getElementById("menu");
-var pauseScreen = document.getElementById("pauseScreen");
-var gameOverScreen = document.getElementById("gameOver");
-var victoryScreen = document.getElementById("victory");
+var $=function(id){return document.getElementById(id)};
 
-var hud = document.getElementById("hud");
-var controls = document.getElementById("controls");
+var menu=$("menu");
+var pauseScreen=$("pauseScreen");
+var gameOverScreen=$("gameOver");
+var victoryScreen=$("victory");
+var hud=$("hud");
+var controls=$("controls");
 
-var scoreText = document.getElementById("scoreText");
-var recordText = document.getElementById("recordText");
+var scoreText=$("scoreText");
+var recordText=$("recordText");
+var finalScore=$("finalScore");
+var bestScore=$("bestScore");
 
-var finalScore = document.getElementById("finalScore");
-var bestScore = document.getElementById("bestScore");
+var startButton=$("startButton");
+var jumpButton=$("jumpButton");
+var pauseButton=$("pauseButton");
+var continueButton=$("continueButton");
+var restartButton=$("restartButton");
+var backButton=$("backButton");
+var pauseMenuButton=$("pauseMenuButton");
+var victoryRestart=$("victoryRestart");
+var victoryMenu=$("victoryMenu");
 
-var startButton = document.getElementById("startButton");
-var jumpButton = document.getElementById("jumpButton");
-var pauseButton = document.getElementById("pauseButton");
+var citySelect=$("city");
+var weatherSelect=$("weather");
+var languageSelect=$("language");
 
-var continueButton = document.getElementById("continueButton");
-var restartButton = document.getElementById("restartButton");
-var backButton = document.getElementById("backButton");
-var pauseMenuButton = document.getElementById("pauseMenuButton");
+var WIN_SCORE=1000;
+var width=0;
+var height=0;
+var dpr=1;
 
-var victoryRestart = document.getElementById("victoryRestart");
-var victoryMenu = document.getElementById("victoryMenu");
+var running=false;
+var paused=false;
+var gameEnded=false;
 
-var citySelect = document.getElementById("city");
-var weatherSelect = document.getElementById("weather");
-var languageSelect = document.getElementById("language");
+var score=0;
+var record=0;
+var speed=6;
+var frame=0;
+var obstacleTimer=0;
+var animationId=0;
+var lastTime=0;
 
-var WIN_SCORE = 1000;
+var selectedCity="warsaw";
+var selectedWeather="sun";
+var selectedLanguage="pl";
 
-var width = 0;
-var height = 0;
-var dpr = 1;
+var obstacles=[];
+var particles=[];
+var clouds=[];
+var rain=[];
+var snow=[];
 
-var running = false;
-var paused = false;
-var gameEnded = false;
-
-var score = 0;
-var record = 0;
-
-var speed = 6;
-var frame = 0;
-var obstacleTimer = 0;
-var animationId = 0;
-var lastTime = 0;
-
-var selectedCity = "warsaw";
-var selectedWeather = "sun";
-var selectedLanguage = "pl";
-
-var obstacles = [];
-var particles = [];
-
-var player = {
-    x: 75,
-    y: 0,
-    width: 44,
-    height: 58,
-    velocityY: 0,
-    grounded: true
+var player={
+x:75,
+y:0,
+width:44,
+height:58,
+velocityY:0,
+grounded:true
 };
 
-var translations = {
+var gravity=0.75;
+var jumpPower=-15;
 
-    pl: {
-        score: "Punkty",
-        record: "Rekord",
-        jump: "SKOK!",
-        start: "ROZPOCZNIJ GRĘ",
-        gameover: "KONIEC GRY!",
-        restart: "ZAGRAJ PONOWNIE"
-    },
-
-    en: {
-        score: "Score",
-        record: "Record",
-        jump: "JUMP!",
-        start: "START GAME",
-        gameover: "GAME OVER!",
-        restart: "PLAY AGAIN"
-    },
-
-    de: {
-        score: "Punkte",
-        record: "Rekord",
-        jump: "SPRINGEN!",
-        start: "SPIEL STARTEN",
-        gameover: "SPIEL VORBEI!",
-        restart: "NOCHMAL"
-    },
-
-    es: {
-        score: "Puntos",
-        record: "Récord",
-        jump: "SALTA!",
-        start: "EMPEZAR",
-        gameover: "FIN DEL JUEGO",
-        restart: "JUGAR OTRA VEZ"
-    },
-
-    fr: {
-        score: "Points",
-        record: "Record",
-        jump: "SAUT!",
-        start: "COMMENCER",
-        gameover: "FIN DU JEU",
-        restart: "REJOUER"
-    },
-
-    it: {
-        score: "Punti",
-        record: "Record",
-        jump: "SALTA!",
-        start: "INIZIA",
-        gameover: "FINE DEL GIOCO",
-        restart: "RIGIOCA"
-    },
-
-    pt: {
-        score: "Pontos",
-        record: "Recorde",
-        jump: "PULAR!",
-        start: "COMEÇAR",
-        gameover: "FIM DE JOGO",
-        restart: "JOGAR NOVAMENTE"
-    },
-
-    nl: {
-        score: "Punten",
-        record: "Record",
-        jump: "SPRING!",
-        start: "START",
-        gameover: "GAME OVER",
-        restart: "OPNIEUW"
-    },
-
-    uk: {
-        score: "Очки",
-        record: "Рекорд",
-        jump: "СТРИБОК!",
-        start: "ПОЧАТИ ГРУ",
-        gameover: "КІНЕЦЬ ГРИ",
-        restart: "ГРАТИ ЗНОВУ"
-    },
-
-    cs: {
-        score: "Body",
-        record: "Rekord",
-        jump: "SKOK!",
-        start: "ZAČÍT HRU",
-        gameover: "KONEC HRY",
-        restart: "HRÁT ZNOVU"
-    },
-
-    ja: {
-        score: "スコア",
-        record: "記録",
-        jump: "ジャンプ!",
-        start: "ゲーム開始",
-        gameover: "ゲームオーバー",
-        restart: "もう一度"
-    }
-
+var translations={
+pl:{score:"Punkty",record:"Rekord",jump:"SKOK!",start:"ROZPOCZNIJ GRĘ",gameover:"KONIEC GRY!",restart:"ZAGRAJ PONOWNIE"},
+en:{score:"Score",record:"Record",jump:"JUMP!",start:"START GAME",gameover:"GAME OVER!",restart:"PLAY AGAIN"},
+de:{score:"Punkte",record:"Rekord",jump:"SPRINGEN!",start:"SPIEL STARTEN",gameover:"SPIEL VORBEI!",restart:"NOCHMAL"},
+es:{score:"Puntos",record:"Récord",jump:"SALTA!",start:"EMPEZAR",gameover:"FIN DEL JUEGO",restart:"JUGAR OTRA VEZ"},
+fr:{score:"Points",record:"Record",jump:"SAUT!",start:"COMMENCER",gameover:"FIN DU JEU",restart:"REJOUER"},
+it:{score:"Punti",record:"Record",jump:"SALTA!",start:"INIZIA",gameover:"FINE DEL GIOCO",restart:"RIGIOCA"},
+pt:{score:"Pontos",record:"Recorde",jump:"PULAR!",start:"COMEÇAR",gameover:"FIM DE JOGO",restart:"JOGAR NOVAMENTE"},
+nl:{score:"Punten",record:"Record",jump:"SPRING!",start:"START",gameover:"GAME OVER",restart:"OPNIEUW"},
+uk:{score:"Очки",record:"Рекорд",jump:"СТРИБОК!",start:"ПОЧАТИ ГРУ",gameover:"КІНЕЦЬ ГРИ",restart:"ГРАТИ ЗНОВУ"},
+cs:{score:"Body",record:"Rekord",jump:"SKOK!",start:"ZAČÍT HRU",gameover:"KONEC HRY",restart:"HRÁT ZNOVU"},
+ja:{score:"スコア",record:"記録",jump:"ジャンプ!",start:"ゲーム開始",gameover:"ゲームオーバー",restart:"もう一度"}
 };
 
-
-/* =================================
-   REKORD
-================================= */
-
-function loadRecord() {
-
-    try {
-        return Number(localStorage.getItem("toaletowySkoczekRecord")) || 0;
-    } catch(error) {
-        return 0;
-    }
-
+function loadRecord(){
+try{return Number(localStorage.getItem("toaletowySkoczekRecord"))||0}
+catch(e){return 0}
 }
 
-function saveRecord() {
-
-    if (score > record) {
-
-        record = score;
-
-        try {
-            localStorage.setItem(
-                "toaletowySkoczekRecord",
-                String(record)
-            );
-        } catch(error) {
-            // Gra działa również bez pamięci lokalnej.
-        }
-
-    }
-
+function saveRecord(){
+if(score>record){
+record=score;
+try{localStorage.setItem("toaletowySkoczekRecord",String(record))}
+catch(e){}
+}
 }
 
+record=loadRecord();
 
-/* =================================
-   TŁUMACZENIA
-================================= */
-
-function translateInterface() {
-
-    var t = translations[selectedLanguage] || translations.pl;
-
-    jumpButton.innerHTML = t.jump;
-    startButton.innerHTML = "▶ " + t.start;
-    restartButton.innerHTML = "🔄 " + t.restart;
-
-    updateHUD();
-
+function groundY(){
+return height-Math.max(95,height*.14);
 }
 
-function updateHUD() {
-
-    var t = translations[selectedLanguage] || translations.pl;
-
-    scoreText.innerHTML = t.score + ": " + score;
-    recordText.innerHTML = t.record + ": " + record;
-
+function resizeCanvas(){
+width=window.innerWidth;
+height=window.innerHeight;
+dpr=Math.min(window.devicePixelRatio||1,2);
+canvas.width=Math.floor(width*dpr);
+canvas.height=Math.floor(height*dpr);
+ctx.setTransform(dpr,0,0,dpr,0,0);
+player.y=groundY()-player.height;
+if(!running)draw();
 }
 
+window.addEventListener("resize",resizeCanvas);
 
-/* =================================
-   CANVAS I ROZMIAR
-================================= */
-
-function groundY() {
-    return height - Math.max(95, height * 0.14);
+function random(min,max){
+return Math.random()*(max-min)+min;
 }
 
-function resizeCanvas() {
-
-    width = window.innerWidth;
-    height = window.innerHeight;
-
-    dpr = window.devicePixelRatio || 1;
-
-    if (dpr > 2) {
-        dpr = 2;
-    }
-
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    if (!running) {
-
-        player.y = groundY() - player.height;
-        draw();
-
-    }
-
+function updateHUD(){
+var t=translations[selectedLanguage]||translations.pl;
+scoreText.textContent=t.score+": "+score;
+recordText.textContent=t.record+": "+record;
 }
 
-window.addEventListener("resize", resizeCanvas);
-
-
-/* =================================
-   LOSOWANIE
-================================= */
-
-function random(min, max) {
-    return Math.random() * (max - min) + min;
+function translateInterface(){
+var t=translations[selectedLanguage]||translations.pl;
+jumpButton.textContent=t.jump;
+startButton.textContent="▶ "+t.start;
+restartButton.textContent="🔄 "+t.restart;
+updateHUD();
 }
 
-
-/* =================================
-   NIEBO
-================================= */
-
-function drawSky() {
-
-    var gradient = ctx.createLinearGradient(0, 0, 0, height);
-
-    if (selectedWeather === "sun") {
-        gradient.addColorStop(0, "#42b7ff");
-        gradient.addColorStop(1, "#d6f4ff");
-    }
-
-    if (selectedWeather === "rain") {
-        gradient.addColorStop(0, "#526b80");
-        gradient.addColorStop(1, "#a5b8c5");
-    }
-
-    if (selectedWeather === "snow") {
-        gradient.addColorStop(0, "#829fb8");
-        gradient.addColorStop(1, "#edf7ff");
-    }
-
-    if (selectedWeather === "fog") {
-        gradient.addColorStop(0, "#9daeb6");
-        gradient.addColorStop(1, "#dbe1e4");
-    }
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
+function showOnly(screen){
+[menu,pauseScreen,gameOverScreen,victoryScreen].forEach(function(item){
+item.classList.add("hidden");
+});
+if(screen)screen.classList.remove("hidden");
 }
 
-
-/* =================================
-   SŁOŃCE
-================================= */
-
-function drawSun() {
-
-    if (selectedWeather !== "sun") {
-        return;
-    }
-
-    ctx.fillStyle = "#ffe45c";
-
-    ctx.beginPath();
-    ctx.arc(width - 80, 90, 38, 0, Math.PI * 2);
-    ctx.fill();
-
+function drawSky(){
+var gradient=ctx.createLinearGradient(0,0,0,height);
+if(selectedWeather==="sun"){
+gradient.addColorStop(0,"#42b7ff");
+gradient.addColorStop(1,"#d6f4ff");
+}else if(selectedWeather==="rain"){
+gradient.addColorStop(0,"#526b80");
+gradient.addColorStop(1,"#a5b8c5");
+}else if(selectedWeather==="snow"){
+gradient.addColorStop(0,"#829fb8");
+gradient.addColorStop(1,"#edf7ff");
+}else{
+gradient.addColorStop(0,"#9daeb6");
+gradient.addColorStop(1,"#dbe1e4");
+}
+ctx.fillStyle=gradient;
+ctx.fillRect(0,0,width,height);
 }
 
-
-/* =================================
-   CHMURY
-================================= */
-
-function drawCloud(x, y, scale) {
-
-    ctx.save();
-
-    ctx.translate(x, y);
-    ctx.scale(scale, scale);
-
-    ctx.fillStyle = "rgba(255,255,255,.85)";
-
-    ctx.beginPath();
-    ctx.arc(0, 0, 20, 0, Math.PI * 2);
-    ctx.arc(25, -10, 28, 0, Math.PI * 2);
-    ctx.arc(55, 0, 21, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-
+function drawSun(){
+if(selectedWeather!=="sun")return;
+ctx.fillStyle="#ffe45c";
+ctx.beginPath();
+ctx.arc(width-80,90,38,0,Math.PI*2);
+ctx.fill();
 }
 
-function drawClouds() {
-
-    var x1 = (width * .15 - frame * .25) % (width + 150);
-    var x2 = (width * .55 - frame * .17) % (width + 150);
-    var x3 = (width * .85 - frame * .20) % (width + 150);
-
-    if (x1 < -100) x1 += width + 150;
-    if (x2 < -100) x2 += width + 150;
-    if (x3 < -100) x3 += width + 150;
-
-    drawCloud(x1, 100, .9);
-    drawCloud(x2, 150, .7);
-    drawCloud(x3, 75, 1);
-
+function drawCloud(x,y,s){
+ctx.save();
+ctx.translate(x,y);
+ctx.scale(s,s);
+ctx.fillStyle="rgba(255,255,255,.85)";
+ctx.beginPath();
+ctx.arc(0,0,20,0,Math.PI*2);
+ctx.arc(25,-10,28,0,Math.PI*2);
+ctx.arc(55,0,21,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
 }
 
-
-/* =================================
-   BUDYNKI
-================================= */
-
-function drawBuildings() {
-
-    var base = groundY();
-    var palettes = {
-
-        warsaw: ["#667e90", "#7893a5"],
-        newyork: ["#526c83", "#71889b"],
-        paris: ["#b58e75", "#c5a48d"],
-        tokyo: ["#657e9d", "#8a9db5"],
-        london: ["#77818b", "#a0a4a5"],
-        dubai: ["#b69d7a", "#d0b48b"],
-        rome: ["#b58b6c", "#d1a687"],
-        rio: ["#6f8c78", "#91a987"]
-
-    };
-
-    var palette = palettes[selectedCity] || palettes.warsaw;
-    var buildingWidth = 75;
-    var offset = (frame * speed * .15) % buildingWidth;
-
-    for (var x = -buildingWidth; x < width + buildingWidth; x += buildingWidth) {
-
-        var index = Math.floor((x + offset + 1000) / buildingWidth);
-        var h = 100 + Math.abs((index * 53) % 130);
-
-        if (selectedCity === "newyork") h += 50;
-        if (selectedCity === "dubai") h += 45;
-        if (selectedCity === "paris") h -= 20;
-
-        ctx.fillStyle = palette[Math.abs(index) % 2];
-
-        ctx.fillRect(
-            x - offset,
-            base - h,
-            buildingWidth - 5,
-            h
-        );
-
-        ctx.fillStyle = "rgba(255,235,170,.7)";
-
-        for (var wy = base - h + 15; wy < base - 15; wy += 25) {
-
-            for (var wx = x - offset + 10; wx < x - offset + buildingWidth - 15; wx += 22) {
-                ctx.fillRect(wx, wy, 9, 12);
-            }
-
-        }
-
-    }
-
+function drawClouds(){
+drawCloud((width*.15-frame*.25)%(width+150),100,.9);
+drawCloud((width*.55-frame*.17)%(width+150),150,.7);
+drawCloud((width*.85-frame*.20)%(width+150),75,1);
 }
 
-
-/* =================================
-   ZNANE BUDOWLE
-================================= */
-
-function drawLandmark() {
-
-    var base = groundY();
-    var x = width * .70;
-
-    ctx.save();
-
-    if (selectedCity === "warsaw") {
-
-        ctx.fillStyle = "#dfe6eb";
-        ctx.fillRect(x, base - 205, 60, 205);
-        ctx.fillRect(x + 18, base - 235, 25, 30);
-        ctx.fillRect(x + 28, base - 265, 5, 30);
-
-    }
-
-    if (selectedCity === "paris") {
-
-        ctx.strokeStyle = "#574a40";
-        ctx.lineWidth = 8;
-
-        ctx.beginPath();
-        ctx.moveTo(x, base);
-        ctx.lineTo(x + 35, base - 220);
-        ctx.lineTo(x + 70, base);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(x + 15, base - 85);
-        ctx.lineTo(x + 55, base - 85);
-        ctx.stroke();
-
-    }
-
-    if (selectedCity === "newyork") {
-
-        ctx.fillStyle = "#49657c";
-        ctx.fillRect(x, base - 205, 70, 205);
-
-        ctx.beginPath();
-        ctx.moveTo(x, base - 205);
-        ctx.lineTo(x + 35, base - 270);
-        ctx.lineTo(x + 70, base - 205);
-        ctx.fill();
-
-    }
-
-    if (selectedCity === "tokyo") {
-
-        ctx.fillStyle = "#f2f2f2";
-        ctx.fillRect(x + 25, base - 210, 12, 210);
-        ctx.fillRect(x + 12, base - 160, 38, 8);
-        ctx.fillRect(x + 12, base - 110, 38, 8);
-        ctx.fillRect(x + 12, base - 60, 38, 8);
-
-    }
-
-    if (selectedCity === "london") {
-
-        ctx.fillStyle = "#d4b35c";
-        ctx.fillRect(x, base - 175, 75, 175);
-        ctx.fillRect(x + 15, base - 205, 45, 30);
-
-        ctx.fillStyle = "#333";
-        ctx.beginPath();
-        ctx.arc(x + 37, base - 135, 15, 0, Math.PI * 2);
-        ctx.fill();
-
-    }
-
-    if (selectedCity === "dubai") {
-
-        ctx.fillStyle = "#d5bd92";
-        ctx.beginPath();
-        ctx.moveTo(x + 10, base);
-        ctx.lineTo(x + 35, base - 320);
-        ctx.lineTo(x + 60, base);
-        ctx.fill();
-
-    }
-
-    if (selectedCity === "rome") {
-
-        ctx.fillStyle = "#c49b76";
-        ctx.fillRect(x, base - 95, 85, 95);
-
-        ctx.fillStyle = "#77583e";
-
-        for (var i = 0; i < 3; i++) {
-
-            ctx.beginPath();
-            ctx.arc(x + 18 + i * 25, base - 10, 10, Math.PI, 0);
-            ctx.fill();
-
-        }
-
-    }
-
-    if (selectedCity === "rio") {
-
-        ctx.fillStyle = "#728d7c";
-        ctx.beginPath();
-        ctx.arc(x + 35, base - 165, 45, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = "#e4dfd5";
-        ctx.fillRect(x + 27, base - 165, 16, 80);
-
-    }
-
-    ctx.restore();
-
+function drawBuildings(){
+var base=groundY();
+var palettes={
+warsaw:["#667e90","#7893a5"],
+newyork:["#526c83","#71889b"],
+paris:["#b58e75","#c5a48d"],
+tokyo:["#657e9d","#8a9db5"],
+london:["#77818b","#a0a4a5"],
+dubai:["#b69d7a","#d0b48b"],
+rome:["#b58b6c","#d1a687"],
+rio:["#6f8c78","#91a987"]
+};
+var palette=palettes[selectedCity]||palettes.warsaw;
+var bw=75;
+var offset=(frame*speed*.15)%bw;
+for(var x=-bw;x<width+bw;x+=bw){
+var index=Math.floor((x+offset+1000)/bw);
+var h=100+Math.abs((index*53)%130);
+if(selectedCity==="newyork"||selectedCity==="dubai")h+=45;
+if(selectedCity==="paris")h-=20;
+ctx.fillStyle=palette[Math.abs(index)%2];
+ctx.fillRect(x-offset,base-h,bw-5,h);
+ctx.fillStyle="rgba(255,235,170,.7)";
+for(var wy=base-h+15;wy<base-15;wy+=25){
+for(var wx=x-offset+10;wx<x-offset+bw-15;wx+=22){
+ctx.fillRect(wx,wy,9,12);
+}
+}
+}
 }
 
-
-/* =================================
-   PODŁOŻE
-================================= */
-
-function drawGround() {
-
-    var y = groundY();
-
-    ctx.fillStyle = "#4c9a45";
-    ctx.fillRect(0, y, width, 18);
-
-    ctx.fillStyle = "#777";
-    ctx.fillRect(0, y + 18, width, height - y);
-
-    ctx.fillStyle = "#c2c2c2";
-
-    for (var x = -100; x < width + 100; x += 90) {
-
-        var lineX = (x - frame * speed) % (width + 90);
-
-        ctx.fillRect(lineX, y + 48, 38, 5);
-
-    }
-
+function drawLandmark(){
+var base=groundY();
+var x=width*.70;
+ctx.save();
+if(selectedCity==="warsaw"){
+ctx.fillStyle="#dfe6eb";
+ctx.fillRect(x,base-205,60,205);
+ctx.fillRect(x+18,base-235,25,30);
+ctx.fillRect(x+28,base-265,5,30);
+}else if(selectedCity==="paris"){
+ctx.strokeStyle="#574a40";
+ctx.lineWidth=8;
+ctx.beginPath();
+ctx.moveTo(x,base);
+ctx.lineTo(x+35,base-220);
+ctx.lineTo(x+70,base);
+ctx.stroke();
+}else if(selectedCity==="newyork"){
+ctx.fillStyle="#49657c";
+ctx.fillRect(x,base-205,70,205);
+ctx.beginPath();
+ctx.moveTo(x,base-205);
+ctx.lineTo(x+35,base-270);
+ctx.lineTo(x+70,base-205);
+ctx.fill();
+}else if(selectedCity==="tokyo"){
+ctx.fillStyle="#f2f2f2";
+ctx.fillRect(x+25,base-210,12,210);
+ctx.fillRect(x+12,base-160,38,8);
+ctx.fillRect(x+12,base-110,38,8);
+ctx.fillRect(x+12,base-60,38,8);
+}else if(selectedCity==="london"){
+ctx.fillStyle="#d4b35c";
+ctx.fillRect(x,base-175,75,175);
+ctx.fillRect(x+15,base-205,45,30);
+}else if(selectedCity==="dubai"){
+ctx.fillStyle="#d5bd92";
+ctx.beginPath();
+ctx.moveTo(x+10,base);
+ctx.lineTo(x+35,base-320);
+ctx.lineTo(x+60,base);
+ctx.fill();
+}else if(selectedCity==="rome"){
+ctx.fillStyle="#c49b76";
+ctx.fillRect(x,base-95,85,95);
+}else if(selectedCity==="rio"){
+ctx.fillStyle="#728d7c";
+ctx.beginPath();
+ctx.arc(x+35,base-165,45,0,Math.PI*2);
+ctx.fill();
+}
+ctx.restore();
 }
 
-
-/* =================================
-   POSTAĆ GRACZA
-================================= */
-
-function drawPlayer() {
-
-    var p = player;
-
-    ctx.save();
-
-    // Głowa
-    ctx.fillStyle = "#ffcc85";
-    ctx.fillRect(p.x + 9, p.y, 29, 29);
-
-    // Włosy
-    ctx.fillStyle = "#54351f";
-    ctx.fillRect(p.x + 8, p.y, 30, 7);
-
-    // Oczy
-    ctx.fillStyle = "#171717";
-    ctx.fillRect(p.x + 17, p.y + 12, 4, 5);
-    ctx.fillRect(p.x + 29, p.y + 12, 4, 5);
-
-    // Uśmiech
-    ctx.strokeStyle = "#9d3d35";
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-    ctx.arc(p.x + 25, p.y + 18, 6, .15, Math.PI - .15);
-    ctx.stroke();
-
-    // Koszulka
-    ctx.fillStyle = "#168bd0";
-    ctx.fillRect(p.x + 5, p.y + 29, 38, 22);
-
-    // Ręce
-    ctx.fillStyle = "#ffcc85";
-    ctx.fillRect(p.x, p.y + 31, 7, 17);
-    ctx.fillRect(p.x + 41, p.y + 31, 7, 17);
-
-    // Spodnie
-    ctx.fillStyle = "#273c91";
-    ctx.fillRect(p.x + 7, p.y + 51, 14, 7);
-    ctx.fillRect(p.x + 28, p.y + 51, 14, 7);
-
-    ctx.restore();
-
+function drawGround(){
+var y=groundY();
+ctx.fillStyle="#4c9a45";
+ctx.fillRect(0,y,width,18);
+ctx.fillStyle="#777";
+ctx.fillRect(0,y+18,width,height-y);
+ctx.fillStyle="#c2c2c2";
+for(var x=-100;x<width+100;x+=90){
+var lineX=(x-frame*speed)%(width+90);
+ctx.fillRect(lineX,y+48,38,5);
+}
 }
 
-
-/* =================================
-   TOALETA
-================================= */
-
-function drawToilet(x, y, scale) {
-
-    ctx.save();
-
-    ctx.translate(x, y);
-    ctx.scale(scale, scale);
-
-    // Cień
-    ctx.fillStyle = "rgba(0,0,0,.2)";
-    ctx.fillRect(0, 68, 65, 8);
-
-    // Zbiornik
-    ctx.fillStyle = "#e9f2f7";
-    ctx.fillRect(35, 0, 25, 35);
-
-    // Pokrywa zbiornika
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(32, -5, 31, 7);
-
-    // Miska
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.moveTo(5, 30);
-    ctx.lineTo(52, 30);
-    ctx.lineTo(58, 48);
-    ctx.quadraticCurveTo(57, 69, 35, 70);
-    ctx.lineTo(18, 70);
-    ctx.quadraticCurveTo(2, 65, 5, 30);
-    ctx.fill();
-
-    // Deska
-    ctx.fillStyle = "#c8dce7";
-    ctx.beginPath();
-    ctx.ellipse(28, 35, 28, 9, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Podstawa
-    ctx.fillStyle = "#dce9ef";
-    ctx.fillRect(18, 63, 27, 8);
-
-    ctx.restore();
-
+function drawPlayer(){
+var p=player;
+ctx.save();
+ctx.fillStyle="#ffcc85";
+ctx.fillRect(p.x+9,p.y,29,29);
+ctx.fillStyle="#54351f";
+ctx.fillRect(p.x+8,p.y,30,7);
+ctx.fillStyle="#171717";
+ctx.fillRect(p.x+17,p.y+12,4,5);
+ctx.fillRect(p.x+29,p.y+12,4,5);
+ctx.strokeStyle="#9d3d35";
+ctx.lineWidth=2;
+ctx.beginPath();
+ctx.arc(p.x+25,p.y+18,6,.15,Math.PI-.15);
+ctx.stroke();
+ctx.fillStyle="#168bd0";
+ctx.fillRect(p.x+5,p.y+29,38,22);
+ctx.fillStyle="#ffcc85";
+ctx.fillRect(p.x,p.y+31,7,17);
+ctx.fillRect(p.x+41,p.y+31,7,17);
+ctx.fillStyle="#273c91";
+ctx.fillRect(p.x+7,p.y+51,14,7);
+ctx.fillRect(p.x+28,p.y+51,14,7);
+ctx.restore();
 }
 
+function drawToilet(x,y,s){
+ctx.save();
+ctx.translate(x,y);
+ctx.scale(s,s);
+ctx.fillStyle="rgba(0,0,0,.2)";
+ctx.fillRect(0,68,65,8);
+ctx.fillStyle="#e9f2f7";
+ctx.fillRect(35,0,25,35);
+ctx.fillStyle="#fff";
+ctx.fillRect(32,-5,31,7);
+ctx.fillStyle="#fff";
+ctx.beginPath();
+ctx.moveTo(5,30);
+ctx.lineTo(52,30);
+ctx.lineTo(58,48);
+ctx.quadraticCurveTo(57,69,35,70);
+ctx.lineTo(18,70);
+ctx.quadraticCurveTo(2,65,5,30);
+ctx.fill();
+ctx.fillStyle="#c8dce7";
+ctx.beginPath();
+ctx.ellipse(28,35,28,9,0,0,Math.PI*2);
+ctx.fill();
+ctx.fillStyle="#dce9ef";
+ctx.fillRect(18,63,27,8);
+ctx.restore();
+}
 
-/* ====
+function drawWeather(){
+if(selectedWeather==="rain"){
+ctx.strokeStyle="rgba(220,240,255,.55)";
+ctx.lineWidth=2;
+for(var i=0;i<70;i++){
+var x=(i*97+frame*5)%width;
+var y=(i*53+frame*9)%height;
+ctx.beginPath();
+ctx.moveTo(x,y);
+ctx.lineTo(x-5,y+15);
+ctx.stroke();
+}
+}else if(selectedWeather==="snow"){
+ctx.fillStyle="rgba(255,255,255,.8)";
+for(var j=0;j<45;j++){
+var sx=(j*79+Math.sin(frame*.02+j)*15)%width;
+var sy=(j*47+frame*1.5)%height;
+ctx.beginPath();
+ctx.arc(sx,sy,2+(j%3),0,Math.PI*2);
+ctx.fill();
+}
+}else if(selectedWeather==="fog"){
+ctx.fillStyle="rgba(235,240,240,.22)";
+for(var k=0;k<5;k++){
+ctx.fillRect(0,k*height/5+Math.sin(frame*.01+k)*10,width,35);
+}
+}
+}
+
+function drawObstacles(){
+obstacles.forEach(function(o){
+drawToilet(o.x,o.y,1);
+});
+}
+
+function draw(){
+if(!ctx||!width||!height)return;
+drawSky();
+drawSun();
+drawClouds();
+drawBuildings();
+drawLandmark();
+drawGround();
+drawObstacles();
+drawPlayer();
+drawWeather();
+}
+
+function jump(){
+if(!running||paused||gameEnded)return;
+if(player.grounded){
+player.velocityY=jumpPower;
+player.grounded=false;
+}
+}
+
+function createObstacle(){
+var y=groundY()-72;
+obstacles.push({x:width+30,y:y,w:65,h:75,passed:false});
+}
+
+function updatePlayer(delta){
+player.velocityY+=gravity*delta;
+player.y+=player.velocityY*delta;
+var floor=groundY()-player.height;
+if(player.y>=floor){
+player.y=floor;
+player.velocityY=0;
+player.grounded=true;
+}
+}
+
+function updateObstacles(delta){
+obstacleTimer+=delta;
+var interval=Math.max(48,95-score*.035);
+if(obstacleTimer>interval){
+createObstacle();
+obstacleTimer=0;
+}
+for(var i=obstacles.length-1;i>=0;i--){
+var o=obstacles[i];
+o.x-=speed*delta;
+if(!o.passed&&o.x+o.w<player.x){
+o.passed=true;
+score=Math.min(WIN_SCORE,score+1);
+updateHUD();
+saveRecord();
+}
+if(o.x+o.w<0)obstacles.splice(i,1);
+}
+}
+
+function checkCollision(){
+var px=player.x+7;
+var py=player.y+5;
+var pw=player.width-14;
+var ph=player.height-7;
+for(var i=0;i<obstacles.length;i++){
+var o=obstacles[i];
+if(px<o.x+o.w-7&&px+pw>o.x+8&&py<o.y+o.h-5&&py+ph>o.y+15){
+endGame();
+return;
+}
+}
+}
+
+function updateParticles(delta){
+for(var i=particles.length-1;i>=0;i--){
+var p=particles[i];
+p.x+=p.vx*delta;
+p.y+=p.vy*delta;
+p.life-=delta;
+if(p.life<=0)particles.splice(i,1);
+}
+}
+
+function spawnParticles(){
+for(var i=0;i<10;i++){
+particles.push({
+x:player.x+20,
+y:player.y+player.height,
+vx:random(-3,3),
+vy:random(-4,-1),
+life:25
+});
+}
+}
+
+function drawParticles(){
+particles.forEach(function(p){
+ctx.globalAlpha=Math.max(0,p.life/25);
+ctx.fillStyle="#ffe34c";
+ctx.fillRect(p.x,p.y,5,5);
+});
+ctx.globalAlpha=1;
+}
+
+function update(delta){
+if(!running||paused||gameEnded)return;
+frame+=delta;
+speed=Math.min(12,6+score*.006);
+updatePlayer(delta);
+updateObstacles(delta);
+updateParticles(delta);
+checkCollision();
+if(score>=WIN_SCORE)winGame();
+}
+
+function gameLoop(timestamp){
+if(!running||paused)return;
+var delta=lastTime?Math.min((timestamp-lastTime)/16.67,2):1;
+lastTime=timestamp;
+update(delta);
+draw();
+drawParticles();
+if(running&&!paused)animationId=requestAnimationFrame(gameLoop);
+}
+
+function startGame(){
+cancelAnimationFrame(animationId);
+score=0;
+speed=6;
+frame=0;
+obstacleTimer=0;
+obstacles=[];
+particles=[];
+player.y=groundY()-player.height;
+player.velocityY=0;
+player.grounded=true;
+running=true;
+paused=false;
+gameEnded=false;
+lastTime=0;
+showOnly(null);
+hud.classList.remove("hidden");
+controls.classList.remove("hidden");
+pauseButton.classList.remove("hidden");
+updateHUD();
+animationId=requestAnimationFrame(gameLoop);
+}
+
+function endGame(){
+if(gameEnded)return;
+gameEnded=true;
+running=false;
+paused=false;
+cancelAnimationFrame(animationId);
+saveRecord();
+hud.classList.add("hidden");
+controls.classList.add("hidden");
+pauseButton.classList.add("hidden");
+finalScore.textContent="Wynik: "+score;
+bestScore.textContent="Rekord: "+record;
+showOnly(gameOverScreen);
+draw();
+}
+
+function winGame(){
+if(gameEnded)return;
+score=WIN_SCORE;
+updateHUD();
+saveRecord();
+gameEnded=true;
+running=false;
+paused=false;
+cancelAnimationFrame(animationId);
+hud.classList.add("hidden");
+controls.classList.add("hidden");
+pauseButton.classList.add("hidden");
+showOnly(victoryScreen);
+draw();
+}
+
+function pauseGame(){
+if(!running||paused||gameEnded)return;
+paused=true;
+cancelAnimationFrame(animationId);
+showOnly(pauseScreen);
+}
+
+function resumeGame(){
+if(!running||!paused)return;
+paused=false;
+showOnly(null);
+lastTime=0;
+animationId=requestAnimationFrame(gameLoop);
+}
+
+function returnToMenu(){
+running=false;
+paused=false;
+gameEnded=false;
+cancelAnimationFrame(animationId);
+hud.classList.add("hidden");
+controls.classList.add("hidden");
+pauseButton.classList.add("hidden");
+showOnly(menu);
+draw();
+}
+
+function setOptions(){
+selectedCity=citySelect.value;
+selectedWeather=weatherSelect.value;
+selectedLanguage=languageSelect.value;
+translateInterface();
+draw();
+}
+
+startButton.addEventListener("click",function(){
+setOptions();
+startGame();
+});
+
+jumpButton.addEventListener("click",jump);
+pauseButton.addEventListener("click",pauseGame);
+continueButton.addEventListener("click",resumeGame);
+restartButton.addEventListener("click",startGame);
+backButton.addEventListener("click",returnToMenu);
+pauseMenuButton.addEventListener("click",returnToMenu);
+victoryRestart.addEventListener("click",startGame);
+victoryMenu.addEventListener("click",returnToMenu);
+
+citySelect.addEventListener("change",function(){
+selectedCity=citySelect.value;
+draw();
+});
+
+weatherSelect.addEventListener("change",function(){
+selectedWeather=weatherSelect.value;
+draw();
+});
+
+languageSelect.addEventListener("change",function(){
+selectedLanguage=languageSelect.value;
+translateInterface();
+});
+
+window.addEventListener("keydown",function(event){
+if(event.code==="Space"||event.code==="ArrowUp"){
+event.preventDefault();
+jump();
+}
+if(event.code==="Escape"&&running&&!paused)pauseGame();
+else if(event.code==="Escape"&&paused)resumeGame();
+if(event.code==="Enter"&&gameEnded)startGame();
+});
+
+canvas.addEventListener("pointerdown",function(){
+jump();
+});
+
+document.addEventListener("visibilitychange",function(){
+if(document.hidden&&running&&!paused)pauseGame();
+});
+
+function initialize(){
+resizeCanvas();
+translateInterface();
+updateHUD();
+draw();
+}
+
+initialize();
+
+})();
+</script>
+</body>
+    </html>
+    
