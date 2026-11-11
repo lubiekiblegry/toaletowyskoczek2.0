@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#14243b">
-<title>Toaletowy Skoczek 3.0</title>
+<title>Toaletowy Skoczek 2.0</title>
 
 <style>
 * {
@@ -19,44 +19,40 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    font-family: Arial, sans-serif;
     background: #14243b;
     color: white;
-    font-family: Arial, sans-serif;
-    touch-action: none;
-}
-
-button, select {
-    font-family: inherit;
+    touch-action: manipulation;
 }
 
 #game {
     position: relative;
     width: 100%;
     height: 100%;
-    height: 100dvh;
+    height: 100vh;
     overflow: hidden;
     background: #80cfff;
 }
 
 #canvas {
+    display: block;
     width: 100%;
     height: 100%;
-    display: block;
 }
 
 .screen {
     position: absolute;
-    inset: 0;
     z-index: 10;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: 14px;
-    padding: 22px;
+    justify-content: center;
+    gap: 13px;
+    padding: 20px;
     text-align: center;
     overflow-y: auto;
-    background: rgba(10, 20, 35, .88);
+    background: rgba(10,20,35,.90);
 }
 
 .hidden {
@@ -64,13 +60,13 @@ button, select {
 }
 
 h1 {
-    font-size: clamp(30px, 8vw, 58px);
     color: #ffe34c;
+    font-size: clamp(28px, 7vw, 55px);
     text-shadow: 3px 4px 0 #65451b;
 }
 
 h2 {
-    font-size: clamp(24px, 6vw, 38px);
+    font-size: clamp(23px, 6vw, 38px);
 }
 
 p {
@@ -82,14 +78,14 @@ select {
     padding: 12px;
     border: 2px solid white;
     border-radius: 12px;
-    font-size: 17px;
+    font-size: 16px;
     background: white;
     color: #17243a;
 }
 
 button {
     min-width: 180px;
-    padding: 14px 22px;
+    padding: 14px 20px;
     border: 0;
     border-radius: 14px;
     background: #ffdb42;
@@ -118,29 +114,27 @@ button.secondary {
     right: 12px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
     gap: 8px;
-    pointer-events: none;
+    font-size: 17px;
     font-weight: bold;
-    font-size: clamp(14px, 4vw, 21px);
+    pointer-events: none;
     text-shadow: 2px 2px 3px black;
 }
 
 .hudBox {
-    padding: 8px 12px;
+    padding: 9px 12px;
     border-radius: 12px;
-    background: rgba(0,0,0,.35);
+    background: rgba(0,0,0,.4);
 }
 
 #pauseButton {
     position: absolute;
     z-index: 6;
-    top: 65px;
+    top: 62px;
     right: 12px;
-    min-width: 48px;
     width: 48px;
-    height: 44px;
-    padding: 5px;
+    min-width: 48px;
+    padding: 8px;
     background: white;
     box-shadow: 0 3px 0 #999;
 }
@@ -150,18 +144,18 @@ button.secondary {
     z-index: 5;
     left: 0;
     right: 0;
-    bottom: max(20px, env(safe-area-inset-bottom));
+    bottom: 20px;
     display: flex;
     justify-content: center;
     pointer-events: none;
 }
 
 #jumpButton {
-    pointer-events: auto;
     width: 155px;
-    height: 72px;
+    height: 70px;
     border-radius: 50px;
     font-size: 23px;
+    pointer-events: auto;
 }
 
 .small {
@@ -176,7 +170,7 @@ button.secondary {
     left: 50%;
     transform: translateX(-50%);
     padding: 12px 18px;
-    background: rgba(0,0,0,.75);
+    background: rgba(0,0,0,.8);
     border-radius: 12px;
     display: none;
 }
@@ -202,8 +196,6 @@ button.secondary {
 </div>
 
 <div id="toast"></div>
-
-<!-- MENU -->
 
 <section id="menu" class="screen">
 
@@ -251,182 +243,116 @@ button.secondary {
 
     <button id="startButton">▶ ROZPOCZNIJ GRĘ</button>
 
-    <p class="small">
-        Sterowanie: dotknij ekranu lub naciśnij SPACJĘ.
-    </p>
-
+    <p class="small">Sterowanie: dotknij SKOK lub naciśnij SPACJĘ.</p>
     <p class="small">Cel: zdobyć 1000 punktów!</p>
 
 </section>
 
-<!-- PAUZA -->
-
 <section id="pauseScreen" class="screen hidden">
-
     <h1>⏸️ PAUZA</h1>
-
     <p>Gra została zatrzymana.</p>
-
     <button id="continueButton">▶ KONTYNUUJ</button>
-
-    <button id="pauseMenuButton" class="secondary">
-        MENU GŁÓWNE
-    </button>
-
+    <button id="pauseMenuButton" class="secondary">MENU GŁÓWNE</button>
 </section>
-
-<!-- PRZEGRANA -->
 
 <section id="gameOver" class="screen hidden">
-
     <h1>💥 KONIEC GRY!</h1>
-
     <h2 id="finalScore">Wynik: 0</h2>
-
     <p id="bestScore">Rekord: 0</p>
-
     <button id="restartButton">🔄 ZAGRAJ PONOWNIE</button>
-
     <button id="backButton" class="secondary">MENU GŁÓWNE</button>
-
 </section>
 
-<!-- ZWYCIĘSTWO -->
-
 <section id="victory" class="screen hidden">
-
     <h1>🏆 WYGRAŁEŚ!</h1>
-
     <h2>1000 PUNKTÓW!</h2>
-
     <p>Jesteś legendą Toaletowego Skoczka!</p>
-
-    <p>Udało Ci się pokonać wszystkie przeszkody!</p>
-
     <button id="victoryRestart">🔄 ZAGRAJ PONOWNIE</button>
-
     <button id="victoryMenu" class="secondary">MENU GŁÓWNE</button>
-
 </section>
 
 </div>
 
 <script>
 
-/* ==========================================
-   TOALETOWY SKOCZEK 3.0
-   GŁÓWNY SILNIK GRY
-========================================== */
+/* =================================
+   TOALETOWY SKOCZEK 2.0
+   SILNIK GRY
+================================= */
 
+(function() {
 
-/* ==========================================
-   ELEMENTY HTML
-========================================== */
+"use strict";
 
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
 
-const menu = document.getElementById("menu");
-const pauseScreen = document.getElementById("pauseScreen");
-const gameOverScreen = document.getElementById("gameOver");
-const victoryScreen = document.getElementById("victory");
+var menu = document.getElementById("menu");
+var pauseScreen = document.getElementById("pauseScreen");
+var gameOverScreen = document.getElementById("gameOver");
+var victoryScreen = document.getElementById("victory");
 
-const hud = document.getElementById("hud");
-const controls = document.getElementById("controls");
+var hud = document.getElementById("hud");
+var controls = document.getElementById("controls");
 
-const scoreText = document.getElementById("scoreText");
-const recordText = document.getElementById("recordText");
+var scoreText = document.getElementById("scoreText");
+var recordText = document.getElementById("recordText");
 
-const finalScore = document.getElementById("finalScore");
-const bestScore = document.getElementById("bestScore");
+var finalScore = document.getElementById("finalScore");
+var bestScore = document.getElementById("bestScore");
 
-const jumpButton = document.getElementById("jumpButton");
-const pauseButton = document.getElementById("pauseButton");
+var startButton = document.getElementById("startButton");
+var jumpButton = document.getElementById("jumpButton");
+var pauseButton = document.getElementById("pauseButton");
 
+var continueButton = document.getElementById("continueButton");
+var restartButton = document.getElementById("restartButton");
+var backButton = document.getElementById("backButton");
+var pauseMenuButton = document.getElementById("pauseMenuButton");
 
-/* ==========================================
-   USTAWIENIA GRY
-========================================== */
+var victoryRestart = document.getElementById("victoryRestart");
+var victoryMenu = document.getElementById("victoryMenu");
 
-const WIN_SCORE = 1000;
+var citySelect = document.getElementById("city");
+var weatherSelect = document.getElementById("weather");
+var languageSelect = document.getElementById("language");
 
-const GRAVITY = 0.82;
-const JUMP_POWER = -16;
+var WIN_SCORE = 1000;
 
-let width = 0;
-let height = 0;
-let dpr = 1;
+var width = 0;
+var height = 0;
+var dpr = 1;
 
-let running = false;
-let paused = false;
-let gameEnded = false;
+var running = false;
+var paused = false;
+var gameEnded = false;
 
-let score = 0;
-let record = loadRecord();
+var score = 0;
+var record = 0;
 
-let speed = 6;
-let frame = 0;
-let obstacleTimer = 0;
+var speed = 6;
+var frame = 0;
+var obstacleTimer = 0;
+var animationId = 0;
+var lastTime = 0;
 
-let selectedCity = "warsaw";
-let selectedWeather = "sun";
-let selectedLanguage = "pl";
+var selectedCity = "warsaw";
+var selectedWeather = "sun";
+var selectedLanguage = "pl";
 
-let animationId = 0;
+var obstacles = [];
+var particles = [];
 
-let lastTime = 0;
-let deltaFactor = 1;
+var player = {
+    x: 75,
+    y: 0,
+    width: 44,
+    height: 58,
+    velocityY: 0,
+    grounded: true
+};
 
-
-/* ==========================================
-   PAMIĘĆ REKORDU
-========================================== */
-
-function loadRecord() {
-
-    try {
-
-        return Number(
-            localStorage.getItem("toaletowySkoczekRecord")
-        ) || 0;
-
-    } catch (error) {
-
-        return 0;
-
-    }
-
-}
-
-function saveRecord() {
-
-    if (score > record) {
-
-        record = score;
-
-        try {
-
-            localStorage.setItem(
-                "toaletowySkoczekRecord",
-                String(record)
-            );
-
-        } catch (error) {
-
-            console.log("Nie można zapisać rekordu.");
-
-        }
-
-    }
-
-}
-
-
-/* ==========================================
-   TŁUMACZENIA
-========================================== */
-
-const languages = {
+var translations = {
 
     pl: {
         score: "Punkty",
@@ -458,7 +384,7 @@ const languages = {
     es: {
         score: "Puntos",
         record: "Récord",
-        jump: "¡SALTA!",
+        jump: "SALTA!",
         start: "EMPEZAR",
         gameover: "FIN DEL JUEGO",
         restart: "JUGAR OTRA VEZ"
@@ -530,65 +456,93 @@ const languages = {
 };
 
 
-/* ==========================================
-   GRACZ
-========================================== */
+/* =================================
+   REKORD
+================================= */
 
-const player = {
+function loadRecord() {
 
-    x: 90,
+    try {
+        return Number(localStorage.getItem("toaletowySkoczekRecord")) || 0;
+    } catch(error) {
+        return 0;
+    }
 
-    y: 0,
+}
 
-    width: 46,
+function saveRecord() {
 
-    height: 58,
+    if (score > record) {
 
-    velocityY: 0,
+        record = score;
 
-    grounded: true,
+        try {
+            localStorage.setItem(
+                "toaletowySkoczekRecord",
+                String(record)
+            );
+        } catch(error) {
+            // Gra działa również bez pamięci lokalnej.
+        }
 
-    jumping: false
+    }
 
-};
-
-
-/* ==========================================
-   LISTY OBIEKTÓW
-========================================== */
-
-let obstacles = [];
-let clouds = [];
-let stars = [];
+}
 
 
-/* ==========================================
-   ROZMIAR CANVAS
-========================================== */
+/* =================================
+   TŁUMACZENIA
+================================= */
+
+function translateInterface() {
+
+    var t = translations[selectedLanguage] || translations.pl;
+
+    jumpButton.innerHTML = t.jump;
+    startButton.innerHTML = "▶ " + t.start;
+    restartButton.innerHTML = "🔄 " + t.restart;
+
+    updateHUD();
+
+}
+
+function updateHUD() {
+
+    var t = translations[selectedLanguage] || translations.pl;
+
+    scoreText.innerHTML = t.score + ": " + score;
+    recordText.innerHTML = t.record + ": " + record;
+
+}
+
+
+/* =================================
+   CANVAS I ROZMIAR
+================================= */
+
+function groundY() {
+    return height - Math.max(95, height * 0.14);
+}
 
 function resizeCanvas() {
 
     width = window.innerWidth;
     height = window.innerHeight;
 
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    dpr = window.devicePixelRatio || 1;
+
+    if (dpr > 2) {
+        dpr = 2;
+    }
 
     canvas.width = Math.floor(width * dpr);
     canvas.height = Math.floor(height * dpr);
 
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     if (!running) {
 
         player.y = groundY() - player.height;
-
         draw();
 
     }
@@ -597,133 +551,72 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 
-resizeCanvas();
 
-
-/* ==========================================
-   PODŁOGA
-========================================== */
-
-function groundY() {
-
-    return height - Math.max(95, height * 0.14);
-
-}
-
-
-/* ==========================================
-   GENERATOR LICZB LOSOWYCH
-========================================== */
+/* =================================
+   LOSOWANIE
+================================= */
 
 function random(min, max) {
-
     return Math.random() * (max - min) + min;
-
 }
 
 
-/* ==========================================
+/* =================================
    NIEBO
-========================================== */
+================================= */
 
 function drawSky() {
 
-    let gradient = ctx.createLinearGradient(
-        0,
-        0,
-        0,
-        height
-    );
+    var gradient = ctx.createLinearGradient(0, 0, 0, height);
 
     if (selectedWeather === "sun") {
-
         gradient.addColorStop(0, "#42b7ff");
         gradient.addColorStop(1, "#d6f4ff");
-
     }
 
     if (selectedWeather === "rain") {
-
         gradient.addColorStop(0, "#526b80");
         gradient.addColorStop(1, "#a5b8c5");
-
     }
 
     if (selectedWeather === "snow") {
-
         gradient.addColorStop(0, "#829fb8");
         gradient.addColorStop(1, "#edf7ff");
-
     }
 
     if (selectedWeather === "fog") {
-
         gradient.addColorStop(0, "#9daeb6");
         gradient.addColorStop(1, "#dbe1e4");
-
     }
 
     ctx.fillStyle = gradient;
-
     ctx.fillRect(0, 0, width, height);
 
 }
 
 
-/* ==========================================
+/* =================================
    SŁOŃCE
-========================================== */
+================================= */
 
 function drawSun() {
 
-    if (selectedWeather !== "sun") return;
-
-    ctx.save();
+    if (selectedWeather !== "sun") {
+        return;
+    }
 
     ctx.fillStyle = "#ffe45c";
 
     ctx.beginPath();
-
-    ctx.arc(
-        width - 85,
-        95,
-        40,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.arc(width - 80, 90, 38, 0, Math.PI * 2);
     ctx.fill();
-
-    ctx.strokeStyle = "rgba(255,228,92,.5)";
-    ctx.lineWidth = 5;
-
-    for (let i = 0; i < 12; i++) {
-
-        let angle = i * Math.PI / 6;
-
-        let x1 = width - 85 + Math.cos(angle) * 48;
-        let y1 = 95 + Math.sin(angle) * 48;
-
-        let x2 = width - 85 + Math.cos(angle) * 60;
-        let y2 = 95 + Math.sin(angle) * 60;
-
-        ctx.beginPath();
-
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-
-        ctx.stroke();
-
-    }
-
-    ctx.restore();
 
 }
 
 
-/* ==========================================
+/* =================================
    CHMURY
-========================================== */
+================================= */
 
 function drawCloud(x, y, scale) {
 
@@ -735,13 +628,9 @@ function drawCloud(x, y, scale) {
     ctx.fillStyle = "rgba(255,255,255,.85)";
 
     ctx.beginPath();
-
     ctx.arc(0, 0, 20, 0, Math.PI * 2);
-
     ctx.arc(25, -10, 28, 0, Math.PI * 2);
-
     ctx.arc(55, 0, 21, 0, Math.PI * 2);
-
     ctx.fill();
 
     ctx.restore();
@@ -750,9 +639,9 @@ function drawCloud(x, y, scale) {
 
 function drawClouds() {
 
-    let x1 = (width * .15 - frame * .25) % (width + 150);
-    let x2 = (width * .55 - frame * .17) % (width + 150);
-    let x3 = (width * .85 - frame * .2) % (width + 150);
+    var x1 = (width * .15 - frame * .25) % (width + 150);
+    var x2 = (width * .55 - frame * .17) % (width + 150);
+    var x3 = (width * .85 - frame * .20) % (width + 150);
 
     if (x1 < -100) x1 += width + 150;
     if (x2 < -100) x2 += width + 150;
@@ -765,17 +654,15 @@ function drawClouds() {
 }
 
 
-/* ==========================================
+/* =================================
    BUDYNKI
-========================================== */
+================================= */
 
 function drawBuildings() {
 
-    const base = groundY();
+    var base = groundY();
+    var palettes = {
 
-    let seed = 0;
-
-    const palettes = {
         warsaw: ["#667e90", "#7893a5"],
         newyork: ["#526c83", "#71889b"],
         paris: ["#b58e75", "#c5a48d"],
@@ -784,26 +671,26 @@ function drawBuildings() {
         dubai: ["#b69d7a", "#d0b48b"],
         rome: ["#b58b6c", "#d1a687"],
         rio: ["#6f8c78", "#91a987"]
+
     };
 
-    const palette = palettes[selectedCity] || palettes.warsaw;
+    var palette = palettes[selectedCity] || palettes.warsaw;
+    var buildingWidth = 75;
+    var offset = (frame * speed * .15) % buildingWidth;
 
-    const buildingWidth = 75;
+    for (var x = -buildingWidth; x < width + buildingWidth; x += buildingWidth) {
 
-    for (let x = 0; x < width + buildingWidth; x += buildingWidth) {
+        var index = Math.floor((x + offset + 1000) / buildingWidth);
+        var h = 100 + Math.abs((index * 53) % 130);
 
-        seed++;
+        if (selectedCity === "newyork") h += 50;
+        if (selectedCity === "dubai") h += 45;
+        if (selectedCity === "paris") h -= 20;
 
-        let h = 100 + ((seed * 53) % 130);
-
-        if (selectedCity === "newyork") h += 60;
-        if (selectedCity === "dubai") h += 50;
-        if (selectedCity === "paris") h -= 25;
-
-        ctx.fillStyle = palette[seed % 2];
+        ctx.fillStyle = palette[Math.abs(index) % 2];
 
         ctx.fillRect(
-            x,
+            x - offset,
             base - h,
             buildingWidth - 5,
             h
@@ -811,12 +698,10 @@ function drawBuildings() {
 
         ctx.fillStyle = "rgba(255,235,170,.7)";
 
-        for (let wy = base - h + 15; wy < base - 15; wy += 25) {
+        for (var wy = base - h + 15; wy < base - 15; wy += 25) {
 
-            for (let wx = x + 10; wx < x + buildingWidth - 15; wx += 22) {
-
+            for (var wx = x - offset + 10; wx < x - offset + buildingWidth - 15; wx += 22) {
                 ctx.fillRect(wx, wy, 9, 12);
-
             }
 
         }
@@ -826,26 +711,22 @@ function drawBuildings() {
 }
 
 
-/* ==========================================
+/* =================================
    ZNANE BUDOWLE
-========================================== */
+================================= */
 
 function drawLandmark() {
 
-    const base = groundY();
-
-    const x = width * .70;
+    var base = groundY();
+    var x = width * .70;
 
     ctx.save();
 
     if (selectedCity === "warsaw") {
 
         ctx.fillStyle = "#dfe6eb";
-
         ctx.fillRect(x, base - 205, 60, 205);
-
         ctx.fillRect(x + 18, base - 235, 25, 30);
-
         ctx.fillRect(x + 28, base - 265, 5, 30);
 
     }
@@ -856,18 +737,14 @@ function drawLandmark() {
         ctx.lineWidth = 8;
 
         ctx.beginPath();
-
         ctx.moveTo(x, base);
         ctx.lineTo(x + 35, base - 220);
         ctx.lineTo(x + 70, base);
-
         ctx.stroke();
 
         ctx.beginPath();
-
         ctx.moveTo(x + 15, base - 85);
         ctx.lineTo(x + 55, base - 85);
-
         ctx.stroke();
 
     }
@@ -875,15 +752,12 @@ function drawLandmark() {
     if (selectedCity === "newyork") {
 
         ctx.fillStyle = "#49657c";
-
         ctx.fillRect(x, base - 205, 70, 205);
 
         ctx.beginPath();
-
         ctx.moveTo(x, base - 205);
         ctx.lineTo(x + 35, base - 270);
         ctx.lineTo(x + 70, base - 205);
-
         ctx.fill();
 
     }
@@ -891,9 +765,7 @@ function drawLandmark() {
     if (selectedCity === "tokyo") {
 
         ctx.fillStyle = "#f2f2f2";
-
         ctx.fillRect(x + 25, base - 210, 12, 210);
-
         ctx.fillRect(x + 12, base - 160, 38, 8);
         ctx.fillRect(x + 12, base - 110, 38, 8);
         ctx.fillRect(x + 12, base - 60, 38, 8);
@@ -903,17 +775,12 @@ function drawLandmark() {
     if (selectedCity === "london") {
 
         ctx.fillStyle = "#d4b35c";
-
         ctx.fillRect(x, base - 175, 75, 175);
-
         ctx.fillRect(x + 15, base - 205, 45, 30);
 
         ctx.fillStyle = "#333";
-
         ctx.beginPath();
-
         ctx.arc(x + 37, base - 135, 15, 0, Math.PI * 2);
-
         ctx.fill();
 
     }
@@ -921,13 +788,10 @@ function drawLandmark() {
     if (selectedCity === "dubai") {
 
         ctx.fillStyle = "#d5bd92";
-
         ctx.beginPath();
-
         ctx.moveTo(x + 10, base);
         ctx.lineTo(x + 35, base - 320);
         ctx.lineTo(x + 60, base);
-
         ctx.fill();
 
     }
@@ -935,23 +799,14 @@ function drawLandmark() {
     if (selectedCity === "rome") {
 
         ctx.fillStyle = "#c49b76";
-
         ctx.fillRect(x, base - 95, 85, 95);
 
         ctx.fillStyle = "#77583e";
 
-        for (let i = 0; i < 3; i++) {
+        for (var i = 0; i < 3; i++) {
 
             ctx.beginPath();
-
-            ctx.arc(
-                x + 18 + i * 25,
-                base - 10,
-                10,
-                Math.PI,
-                0
-            );
-
+            ctx.arc(x + 18 + i * 25, base - 10, 10, Math.PI, 0);
             ctx.fill();
 
         }
@@ -961,15 +816,11 @@ function drawLandmark() {
     if (selectedCity === "rio") {
 
         ctx.fillStyle = "#728d7c";
-
         ctx.beginPath();
-
         ctx.arc(x + 35, base - 165, 45, 0, Math.PI * 2);
-
         ctx.fill();
 
         ctx.fillStyle = "#e4dfd5";
-
         ctx.fillRect(x + 27, base - 165, 16, 80);
 
     }
@@ -979,117 +830,130 @@ function drawLandmark() {
 }
 
 
-/* ==========================================
+/* =================================
    PODŁOŻE
-========================================== */
+================================= */
 
 function drawGround() {
 
-    const y = groundY();
+    var y = groundY();
 
     ctx.fillStyle = "#4c9a45";
-
     ctx.fillRect(0, y, width, 18);
 
     ctx.fillStyle = "#777";
-
-    ctx.fillRect(
-        0,
-        y + 18,
-        width,
-        height - y
-    );
+    ctx.fillRect(0, y + 18, width, height - y);
 
     ctx.fillStyle = "#c2c2c2";
 
-    for (let x = -100; x < width + 100; x += 90) {
+    for (var x = -100; x < width + 100; x += 90) {
 
-        let lineX = (
-            x - frame * speed
-        ) % (width + 90);
+        var lineX = (x - frame * speed) % (width + 90);
 
-        ctx.fillRect(
-            lineX,
-            y + 48,
-            38,
-            5
-        );
+        ctx.fillRect(lineX, y + 48, 38, 5);
 
     }
 
 }
 
 
-/* ==========================================
+/* =================================
    POSTAĆ GRACZA
-========================================== */
+================================= */
 
 function drawPlayer() {
 
-    const p = player;
+    var p = player;
 
     ctx.save();
 
     // Głowa
-
     ctx.fillStyle = "#ffcc85";
-
-    ctx.fillRect(
-        p.x + 9,
-        p.y,
-        29,
-        29
-    );
+    ctx.fillRect(p.x + 9, p.y, 29, 29);
 
     // Włosy
-
     ctx.fillStyle = "#54351f";
-
-    ctx.fillRect(
-        p.x + 8,
-        p.y,
-        30,
-        7
-    );
+    ctx.fillRect(p.x + 8, p.y, 30, 7);
 
     // Oczy
-
     ctx.fillStyle = "#171717";
-
     ctx.fillRect(p.x + 17, p.y + 12, 4, 5);
     ctx.fillRect(p.x + 29, p.y + 12, 4, 5);
 
     // Uśmiech
-
     ctx.strokeStyle = "#9d3d35";
     ctx.lineWidth = 2;
 
     ctx.beginPath();
-
-    ctx.arc(
-        p.x + 25,
-        p.y + 18,
-        6,
-        .15,
-        Math.PI - .15
-    );
-
+    ctx.arc(p.x + 25, p.y + 18, 6, .15, Math.PI - .15);
     ctx.stroke();
 
     // Koszulka
-
     ctx.fillStyle = "#168bd0";
-
-    ctx.fillRect(
-        p.x + 5,
-        p.y + 29,
-        38,
-        22
-    );
+    ctx.fillRect(p.x + 5, p.y + 29, 38, 22);
 
     // Ręce
-
     ctx.fillStyle = "#ffcc85";
-
     ctx.fillRect(p.x, p.y + 31, 7, 17);
-    ctx.fillRect(p.x + 41, p.y + 31, 7, 
+    ctx.fillRect(p.x + 41, p.y + 31, 7, 17);
+
+    // Spodnie
+    ctx.fillStyle = "#273c91";
+    ctx.fillRect(p.x + 7, p.y + 51, 14, 7);
+    ctx.fillRect(p.x + 28, p.y + 51, 14, 7);
+
+    ctx.restore();
+
+}
+
+
+/* =================================
+   TOALETA
+================================= */
+
+function drawToilet(x, y, scale) {
+
+    ctx.save();
+
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+
+    // Cień
+    ctx.fillStyle = "rgba(0,0,0,.2)";
+    ctx.fillRect(0, 68, 65, 8);
+
+    // Zbiornik
+    ctx.fillStyle = "#e9f2f7";
+    ctx.fillRect(35, 0, 25, 35);
+
+    // Pokrywa zbiornika
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(32, -5, 31, 7);
+
+    // Miska
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(5, 30);
+    ctx.lineTo(52, 30);
+    ctx.lineTo(58, 48);
+    ctx.quadraticCurveTo(57, 69, 35, 70);
+    ctx.lineTo(18, 70);
+    ctx.quadraticCurveTo(2, 65, 5, 30);
+    ctx.fill();
+
+    // Deska
+    ctx.fillStyle = "#c8dce7";
+    ctx.beginPath();
+    ctx.ellipse(28, 35, 28, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Podstawa
+    ctx.fillStyle = "#dce9ef";
+    ctx.fillRect(18, 63, 27, 8);
+
+    ctx.restore();
+
+}
+
+
+/* ====
