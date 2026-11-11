@@ -1,0 +1,900 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Toaletowy Skoczek 2.0</title>
+
+<style>
+* { box-sizing:border-box; }
+
+html,body {
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#111827;
+  color:white;
+  font-family:Arial,sans-serif;
+  touch-action:manipulation;
+}
+
+#game {
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+  background:#83d4ff;
+}
+
+canvas {
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+#record {
+  position:absolute;
+  top:max(12px,env(safe-area-inset-top));
+  right:12px;
+  padding:10px 14px;
+  border-radius:12px;
+  background:#111827dd;
+  font-weight:bold;
+  z-index:2;
+}
+
+#record span { color:#ffdc45; }
+
+#score {
+  position:absolute;
+  top:max(14px,env(safe-area-inset-top));
+  left:14px;
+  font-size:23px;
+  font-weight:bold;
+  text-shadow:1px 2px 4px #0008;
+  z-index:2;
+}
+
+#cityLabel {
+  position:absolute;
+  top:65px;
+  left:14px;
+  padding:7px 12px;
+  border-radius:10px;
+  background:#111827aa;
+  font-weight:bold;
+  z-index:2;
+}
+
+#overlay {
+  position:absolute;
+  inset:0;
+  background:#101827d9;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  text-align:center;
+  z-index:3;
+  overflow:auto;
+}
+
+#overlay h1 {
+  font-size:clamp(30px,8vw,52px);
+  margin:10px;
+}
+
+#overlay p {
+  font-size:clamp(15px,4vw,21px);
+  line-height:1.5;
+}
+
+button,select {
+  border:0;
+  border-radius:14px;
+  padding:14px 20px;
+  font-size:17px;
+  font-weight:bold;
+}
+
+button {
+  background:#ffda44;
+  color:#172033;
+  cursor:pointer;
+}
+
+select {
+  background:white;
+  color:#172033;
+  width:min(270px,85vw);
+  margin:8px;
+}
+
+#jump {
+  position:absolute;
+  right:20px;
+  bottom:max(22px,env(safe-area-inset-bottom));
+  width:95px;
+  height:95px;
+  border-radius:50%;
+  background:#22c55e;
+  color:white;
+  font-size:17px;
+  z-index:2;
+  box-shadow:0 4px 15px #0005;
+}
+
+#jump:active { transform:scale(.94); }
+
+.hidden { display:none !important; }
+
+.small {
+  font-size:13px;
+  opacity:.75;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+<canvas id="canvas"></canvas>
+
+<div id="score">Wynik: 0</div>
+
+<div id="record">
+🏆 <span id="recordTitle">REKORD</span><br>
+<span id="best">0</span>
+</div>
+
+<div id="cityLabel">🏙️ WARSZAWA</div>
+
+<div id="overlay"></div>
+
+<button id="jump">⬆ SKACZ!</button>
+</div>
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+const overlay=document.getElementById("overlay");
+
+const scoreText=document.getElementById("score");
+const bestText=document.getElementById("best");
+const cityLabel=document.getElementById("cityLabel");
+const recordTitle=document.getElementById("recordTitle");
+
+const translations={
+pl:{
+title:"🚽 Toaletowy Skoczek",
+desc:"Przeskakuj nad kiblami!<br>Każdy przeskoczony kibel to 1 punkt.",
+start:"▶ START GRY",
+jump:"⬆ SKACZ!",
+score:"Wynik",
+record:"REKORD",
+language:"🌍 Wybierz język",
+gameover:"💥 KONIEC GRY!",
+yourScore:"Twój wynik",
+again:"🔄 ZAGRAJ PONOWNIE",
+city:"Miasto",
+weather:"Pogoda",
+sun:"Słonecznie",rain:"Deszcz",snow:"Śnieg",fog:"Mgła"
+},
+en:{
+title:"🚽 Toilet Jumper",
+desc:"Jump over toilets!<br>Every toilet you avoid gives 1 point.",
+start:"▶ START GAME",
+jump:"⬆ JUMP!",
+score:"Score",
+record:"RECORD",
+language:"🌍 Choose language",
+gameover:"💥 GAME OVER!",
+yourScore:"Your score",
+again:"🔄 PLAY AGAIN",
+city:"City",
+weather:"Weather",
+sun:"Sunny",rain:"Rain",snow:"Snow",fog:"Fog"
+},
+de:{
+title:"🚽 Toiletten-Springer",
+desc:"Springe über Toiletten!<br>Jede übersprungene Toilette gibt 1 Punkt.",
+start:"▶ START",
+jump:"⬆ SPRINGEN!",
+score:"Punkte",
+record:"REKORD",
+language:"🌍 Sprache wählen",
+gameover:"💥 SPIEL VORBEI!",
+yourScore:"Dein Ergebnis",
+again:"🔄 NOCHMAL",
+city:"Stadt",
+weather:"Wetter",
+sun:"Sonnig",rain:"Regen",snow:"Schnee",fog:"Nebel"
+},
+es:{
+title:"🚽 Saltador de Baños",
+desc:"¡Salta sobre los inodoros!<br>Cada uno vale 1 punto.",
+start:"▶ EMPEZAR",
+jump:"⬆ ¡SALTAR!",
+score:"Puntos",
+record:"RÉCORD",
+language:"🌍 Elegir idioma",
+gameover:"💥 FIN DEL JUEGO",
+yourScore:"Tu puntuación",
+again:"🔄 JUGAR OTRA VEZ",
+city:"Ciudad",
+weather:"Clima",
+sun:"Soleado",rain:"Lluvia",snow:"Nieve",fog:"Niebla"
+},
+fr:{
+title:"🚽 Sauteur de Toilettes",
+desc:"Saute par-dessus les toilettes !<br>Chaque toilette évitée vaut 1 point.",
+start:"▶ COMMENCER",
+jump:"⬆ SAUTER !",
+score:"Score",
+record:"RECORD",
+language:"🌍 Choisir la langue",
+gameover:"💥 FIN DU JEU !",
+yourScore:"Ton score",
+again:"🔄 REJOUER",
+city:"Ville",
+weather:"Météo",
+sun:"Ensoleillé",rain:"Pluie",snow:"Neige",fog:"Brouillard"
+},
+it:{
+title:"🚽 Salta WC",
+desc:"Salta sopra i WC!<br>Ogni WC superato vale 1 punto.",
+start:"▶ INIZIA",
+jump:"⬆ SALTA!",
+score:"Punti",
+record:"RECORD",
+language:"🌍 Scegli lingua",
+gameover:"💥 FINE GIOCO!",
+yourScore:"Il tuo punteggio",
+again:"🔄 RIPROVA",
+city:"Città",
+weather:"Meteo",
+sun:"Sole",rain:"Pioggia",snow:"Neve",fog:"Nebbia"
+},
+pt:{
+title:"🚽 Saltador de Banheiros",
+desc:"Salte sobre os vasos sanitários!<br>Cada um vale 1 ponto.",
+start:"▶ COMEÇAR",
+jump:"⬆ PULAR!",
+score:"Pontos",
+record:"RECORDE",
+language:"🌍 Escolher idioma",
+gameover:"💥 FIM DE JOGO!",
+yourScore:"Sua pontuação",
+again:"🔄 JOGAR NOVAMENTE",
+city:"Cidade",
+weather:"Clima",
+sun:"Sol",rain:"Chuva",snow:"Neve",fog:"Nevoeiro"
+},
+nl:{
+title:"🚽 Toiletspringer",
+desc:"Spring over toiletten!<br>Elke toilet geeft 1 punt.",
+start:"▶ START",
+jump:"⬆ SPRING!",
+score:"Score",
+record:"RECORD",
+language:"🌍 Kies taal",
+gameover:"💥 SPEL AFGELOPEN!",
+yourScore:"Jouw score",
+again:"🔄 OPNIEUW SPELEN",
+city:"Stad",
+weather:"Weer",
+sun:"Zonnig",rain:"Regen",snow:"Sneeuw",fog:"Mist"
+},
+uk:{
+title:"🚽 Туалетний стрибун",
+desc:"Стрибай через туалети!<br>Кожен пропущений туалет дає 1 бал.",
+start:"▶ ПОЧАТИ",
+jump:"⬆ СТРИБАТИ!",
+score:"Рахунок",
+record:"РЕКОРД",
+language:"🌍 Вибрати мову",
+gameover:"💥 ГРУ ЗАВЕРШЕНО!",
+yourScore:"Твій результат",
+again:"🔄 ГРАТИ ЗНОВУ",
+city:"Місто",
+weather:"Погода",
+sun:"Сонячно",rain:"Дощ",snow:"Сніг",fog:"Туман"
+},
+cs:{
+title:"🚽 Toaletní Skokan",
+desc:"Přeskakuj toalety!<br>Každá přeskočená toaleta je 1 bod.",
+start:"▶ START",
+jump:"⬆ SKÁKAT!",
+score:"Skóre",
+record:"REKORD",
+language:"🌍 Vyber jazyk",
+gameover:"💥 KONEC HRY!",
+yourScore:"Tvůj výsledek",
+again:"🔄 HRÁT ZNOVU",
+city:"Město",
+weather:"Počasí",
+sun:"Slunečno",rain:"Déšť",snow:"Sníh",fog:"Mlha"
+},
+ja:{
+title:"🚽 トイレジャンパー",
+desc:"トイレを飛び越えよう！<br>1つ避けるごとに1ポイント。",
+start:"▶ スタート",
+jump:"⬆ ジャンプ!",
+score:"スコア",
+record:"記録",
+language:"🌍 言語を選択",
+gameover:"💥 ゲームオーバー!",
+yourScore:"スコア",
+again:"🔄 もう一度",
+city:"都市",
+weather:"天気",
+sun:"晴れ",rain:"雨",snow:"雪",fog:"霧"
+}
+};
+
+const languages={
+pl:"Polski",en:"English",de:"Deutsch",es:"Español",
+fr:"Français",it:"Italiano",pt:"Português",
+nl:"Nederlands",uk:"Українська",cs:"Čeština",ja:"日本語"
+};
+
+let lang="pl";
+try {
+ lang=localStorage.getItem("toaletowyJezyk")||"pl";
+} catch(e){}
+
+function T(key){
+ return (translations[lang]||translations.pl)[key]||translations.pl[key]||key;
+}
+
+const cities=[
+{name:"WARSZAWA",key:"warsaw",sky:"#83d4ff"},
+{name:"NOWY JORK",key:"newyork",sky:"#9bc9f3"},
+{name:"PARYŻ",key:"paris",sky:"#f5c7a0"},
+{name:"TOKIO",key:"tokyo",sky:"#f4b9d0"},
+{name:"LONDYN",key:"london",sky:"#b4c9dd"},
+{name:"DUBAJ",key:"dubai",sky:"#ffd49b"},
+{name:"RZYM",key:"rome",sky:"#f4d9aa"},
+{name:"RIO DE JANEIRO",key:"rio",sky:"#8ee0ce"}
+];
+
+const weatherTypes=["sun","rain","snow","fog"];
+
+let W=900,H=420,ground=330;
+let player,obstacles=[];
+let score=0,best=0,speed=6;
+let city=cities[0],weather="sun";
+let running=false,lastTime=0,animationId=null;
+let particles=[];
+let skyline=[];
+let frame=0;
+
+try {
+ best=Number(localStorage.getItem("toaletowyRekord"))||0;
+}catch(e){}
+
+bestText.textContent=best;
+
+function resize(){
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ W=window.innerWidth;
+ H=window.innerHeight;
+
+ canvas.width=Math.round(W*dpr);
+ canvas.height=Math.round(H*dpr);
+ canvas.style.width=W+"px";
+ canvas.style.height=H+"px";
+
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ground=H*.79;
+
+ if(player){
+   player.x=W*.13;
+   player.y=Math.min(player.y,ground-player.h);
+ }
+
+ if(!running)draw();
+}
+
+window.addEventListener("resize",resize);
+
+function fullscreen(){
+ const el=document.documentElement;
+ if(!document.fullscreenElement&&el.requestFullscreen){
+  el.requestFullscreen().catch(()=>{});
+ }
+}
+
+function showMenu(gameOver=false){
+ overlay.style.display="flex";
+
+ overlay.innerHTML=`
+ <h1>${gameOver?T("gameover"):T("title")}</h1>
+ ${gameOver?`
+ <p>${T("city")}: <b>${city.name}</b></p>
+ <p>${T("yourScore")}: <b>${score}</b></p>
+ <p>🏆 ${T("record")}: <b>${best}</b></p>
+ `:`<p>${T("desc")}</p>`}
+
+ <p>${T("language")}</p>
+
+ <select id="languageSelect">
+ ${Object.entries(languages).map(([code,name])=>
+ `<option value="${code}" ${code===lang?"selected":""}>${name}</option>`
+ ).join("")}
+ </select>
+
+ <button id="startButton">${gameOver?T("again"):T("start")}</button>
+ <p class="small">Toaletowy Skoczek 2.0</p>
+ `;
+
+ document.getElementById("languageSelect").onchange=e=>{
+  lang=e.target.value;
+  try{localStorage.setItem("toaletowyJezyk",lang);}catch(e){}
+  showMenu(gameOver);
+ };
+
+ document.getElementById("startButton").onclick=newGame;
+}
+
+function newGame(){
+ fullscreen();
+
+ if(animationId!==null)cancelAnimationFrame(animationId);
+
+ city=cities[Math.floor(Math.random()*cities.length)];
+ weather=weatherTypes[Math.floor(Math.random()*weatherTypes.length)];
+
+ player={
+  x:W*.13,
+  y:ground-65,
+  w:42,h:65,
+  vy:0,
+  grounded:true
+ };
+
+ obstacles=[];
+ particles=[];
+ score=0;
+ speed=Math.max(5,W/150);
+ frame=0;
+ spawnTimer=55;
+ running=true;
+ lastTime=performance.now();
+
+ createSkyline();
+
+ overlay.style.display="none";
+ updateUI();
+ draw();
+
+ animationId=requestAnimationFrame(loop);
+}
+
+let spawnTimer=0;
+
+function updateUI(){
+ scoreText.textContent=T("score")+": "+score;
+ bestText.textContent=best;
+ recordTitle.textContent=T("record");
+ document.getElementById("jump").textContent=T("jump");
+ cityLabel.textContent="🏙️ "+city.name;
+}
+
+function jump(){
+ if(running&&player.grounded){
+  player.vy=-Math.max(12,H/40);
+  player.grounded=false;
+ }
+}
+
+document.getElementById("jump").addEventListener("pointerdown",e=>{
+ e.preventDefault();
+ if(!running)newGame();
+ else jump();
+});
+
+canvas.addEventListener("pointerdown",()=>{
+ if(running)jump();
+});
+
+document.addEventListener("keydown",e=>{
+ if(e.code==="Space"||e.code==="ArrowUp"){
+  e.preventDefault();
+  if(!running)newGame();
+  else jump();
+ }
+});
+
+function createSkyline(){
+ skyline=[];
+ let x=0;
+ while(x<W+150){
+  let width=45+Math.random()*65;
+  let height=H*(.15+Math.random()*.22);
+  skyline.push({x,width,height,
+   color=["#647b96","#8c9fb3","#526981","#455b75"][Math.floor(Math.random()*4)]});
+  x+=width;
+ }
+}
+
+function drawBuilding(x,y,w,h,color){
+ ctx.fillStyle=color;
+ ctx.fillRect(x,y,w,h);
+ ctx.fillStyle="#ffe8a1";
+
+ for(let wy=y+15;wy<y+h-8;wy+=23){
+  for(let wx=x+8;wx<x+w-8;wx+=18){
+   ctx.fillRect(wx,wy,8,11);
+  }
+ }
+}
+
+function drawLandmark(){
+ const base=ground;
+ const center=W*.73;
+ const s=Math.min(W,H)/420;
+
+ ctx.save();
+ ctx.translate(center,base);
+ ctx.scale(s,s);
+
+ ctx.fillStyle="#354c69";
+
+ if(city.key==="paris"){
+  // Wieża Eiffla
+  ctx.beginPath();
+  ctx.moveTo(-35,0);
+  ctx.lineTo(-5,-125);
+  ctx.lineTo(5,-125);
+  ctx.lineTo(35,0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillRect(-18,-75,36,5);
+  ctx.fillRect(-26,-45,52,5);
+  ctx.fillRect(-5,-145,10,20);
+ }
+ else if(city.key==="london"){
+  // Big Ben
+  ctx.fillRect(-24,-105,48,105);
+  ctx.fillStyle="#e9d7a9";
+  ctx.fillRect(-17,-92,34,25);
+  ctx.fillStyle="#fff4cc";
+  ctx.beginPath();
+  ctx.arc(0,-80,10,0,Math.PI*2);
+  ctx.fill();
+  ctx.fillStyle="#354c69";
+  ctx.beginPath();
+  ctx.moveTo(-29,-105);
+  ctx.lineTo(0,-145);
+  ctx.lineTo(29,-105);
+  ctx.fill();
+ }
+ else if(city.key==="newyork"){
+  // Wieżowce
+  ctx.fillRect(-42,-130,32,130);
+  ctx.fillRect(-5,-180,32,180);
+  ctx.fillRect(33,-105,26,105);
+  ctx.fillStyle="#a8c5dd";
+  ctx.fillRect(3,-170,16,150);
+ }
+ else if(city.key==="tokyo"){
+  // Tokyo Tower
+  ctx.fillStyle="#d85b4e";
+  ctx.beginPath();
+  ctx.moveTo(-35,0);
+  ctx.lineTo(-9,-135);
+  ctx.lineTo(9,-135);
+  ctx.lineTo(35,0);
+  ctx.fill();
+  ctx.fillStyle="#fff0e7";
+  ctx.fillRect(-23,-55,46,5);
+  ctx.fillRect(-17,-90,34,5);
+  ctx.fillRect(-6,-150,12,15);
+ }
+ else if(city.key==="dubai"){
+  // Burj Khalifa
+  ctx.fillStyle="#526981";
+  ctx.beginPath();
+  ctx.moveTo(-17,0);
+  ctx.lineTo(-12,-95);
+  ctx.lineTo(-8,-150);
+  ctx.lineTo(-3,-225);
+  ctx.lineTo(0,-260);
+  ctx.lineTo(4,-175);
+  ctx.lineTo(12,-100);
+  ctx.lineTo(20,0);
+  ctx.fill();
+ }
+ else if(city.key==="rome"){
+  // Koloseum
+  ctx.fillStyle="#b38d65";
+  ctx.beginPath();
+  ctx.ellipse(0,-45,70,38,0,Math.PI,Math.PI*2);
+  ctx.lineTo(70,0);
+  ctx.lineTo(-70,0);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle="#574d45";
+  for(let i=-45;i<=45;i+=22){
+   ctx.fillRect(i,-48,12,35);
+  }
+ }
+ else if(city.key==="rio"){
+  // Pomnik Chrystusa
+  ctx.fillStyle="#e8e6dd";
+  ctx.fillRect(-5,-90,10,90);
+  ctx.fillRect(-48,-82,96,9);
+  ctx.beginPath();
+  ctx.arc(0,-105,13,0,Math.PI*2);
+  ctx.fill();
+ }
+ else {
+  // Pałac Kultury w Warszawie
+  ctx.fillRect(-35,-95,70,95);
+  ctx.fillRect(-24,-120,48,25);
+  ctx.fillRect(-12,-145,24,25);
+  ctx.beginPath();
+  ctx.moveTo(-8,-145);
+  ctx.lineTo(0,-185);
+  ctx.lineTo(8,-145);
+  ctx.fill();
+ }
+
+ ctx.restore();
+}
+
+function drawCity(){
+ ctx.fillStyle=city.sky;
+ ctx.fillRect(0,0,W,H);
+
+ // Słońce lub księżyc
+ ctx.fillStyle=weather==="sun"?"#fff0a3":"#e8edf4";
+ ctx.beginPath();
+ ctx.arc(W*.83,H*.16,Math.min(W,H)*.055,0,Math.PI*2);
+ ctx.fill();
+
+ // Chmury
+ ctx.fillStyle="#ffffffbb";
+ for(let i=0;i<4;i++){
+  let x=(i*W/3-frame*.3)%(W+150);
+  if(x<0)x+=W+150;
+  let y=H*(.13+(i%2)*.08);
+  ctx.beginPath();
+  ctx.arc(x,y,18,0,Math.PI*2);
+  ctx.arc(x+22,y-10,25,0,Math.PI*2);
+  ctx.arc(x+45,y,18,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ // Budynki w tle
+ for(const b of skyline){
+  const x=((b.x-frame*.3)%(W+100)+W+100)%(W+100)-50;
+  drawBuilding(x,ground-b.height,b.width,b.height,b.color);
+ }
+
+ // Charakterystyczny budynek miasta
+ drawLandmark();
+
+ // Droga
+ ctx.fillStyle="#424b5b";
+ ctx.fillRect(0,ground,W,H-ground);
+
+ ctx.fillStyle="#f8dd6b";
+ for(let x=0;x<W+100;x+=100){
+  let lineX=(x-frame*speed*.5%100+100)%(W+100);
+  ctx.fillRect(lineX,ground+(H-ground)*.5,42,5);
+ }
+
+ ctx.fillStyle="#f5f5f5";
+ ctx.fillRect(0,ground,W,4);
+
+ drawWeather();
+}
+
+function drawWeather(){
+ if(weather==="sun")return;
+
+ ctx.save();
+
+ if(weather==="rain"){
+  ctx.strokeStyle="#dceeffaa";
+  ctx.lineWidth=2;
+  for(let i=0;i<65;i++){
+   let x=(i*137+frame*5)%(W+30);
+   let y=(i*79+frame*9)%(H*.8);
+   ctx.beginPath();
+   ctx.moveTo(x,y);
+   ctx.lineTo(x-5,y+16);
+   ctx.stroke();
+  }
+ }
+ else if(weather==="snow"){
+  ctx.fillStyle="#ffffffcc";
+  for(let i=0;i<45;i++){
+   let x=(i*137+frame*.8)%(W+20);
+   let y=(i*83+frame*1.7)%(H*.85);
+   ctx.beginPath();
+   ctx.arc(x,y,3+(i%3),0,Math.PI*2);
+   ctx.fill();
+  }
+ }
+ else if(weather==="fog"){
+  ctx.fillStyle="#ffffff55";
+  ctx.fillRect(0,H*.35,W,H*.35);
+ }
+ ctx.restore();
+}
+
+function drawPlayer(){
+ const p=player;
+ const s=Math.max(.7,Math.min(1.2,H/420));
+
+ // Głowa
+ ctx.fillStyle="#ffd0a0";
+ ctx.beginPath();
+ ctx.arc(p.x+22*s,p.y+15*s,16*s,0,Math.PI*2);
+ ctx.fill();
+
+ // Włosy
+ ctx.fillStyle="#513728";
+ ctx.fillRect(p.x+9*s,p.y,25*s,7*s);
+
+ // Koszulka
+ ctx.fillStyle="#3185ff";
+ ctx.fillRect(p.x+7*s,p.y+30*s,30*s,24*s);
+
+ // Ręce
+ ctx.strokeStyle="#ffd0a0";
+ ctx.lineWidth=5*s;
+ ctx.beginPath();
+ ctx.moveTo(p.x+9*s,p.y+35*s);
+ ctx.lineTo(p.x,p.y+44*s);
+ ctx.moveTo(p.x+36*s,p.y+35*s);
+ ctx.lineTo(p.x+44*s,p.y+43*s);
+ ctx.stroke();
+
+ // Nogi
+ const swing=p.grounded?Math.sin(performance.now()/70)*7*s:0;
+ ctx.strokeStyle="#172033";
+ ctx.lineWidth=7*s;
+ ctx.lineCap="round";
+ ctx.beginPath();
+ ctx.moveTo(p.x+15*s,p.y+52*s);
+ ctx.lineTo(p.x+10*s+swing,p.y+64*s);
+ ctx.moveTo(p.x+30*s,p.y+52*s);
+ ctx.lineTo(p.x+35*s-swing,p.y+64*s);
+ ctx.stroke();
+
+ ctx.fillStyle="#172033";
+ ctx.beginPath();
+ ctx.arc(p.x+28*s,p.y+13*s,2*s,0,Math.PI*2);
+ ctx.fill();
+}
+
+function drawToilet(o){
+ const s=Math.max(.7,Math.min(1.2,H/420));
+
+ ctx.save();
+ ctx.translate(o.x,ground);
+ ctx.scale(s,s);
+
+ ctx.fillStyle="#f8fafc";
+ ctx.fillRect(13,-53,36,26);
+
+ ctx.fillStyle="#dbe5ef";
+ ctx.beginPath();
+ ctx.ellipse(31,-28,29,9,0,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.fillStyle="#ffffff";
+ ctx.beginPath();
+ ctx.moveTo(5,-29);
+ ctx.lineTo(55,-29);
+ ctx.lineTo(50,-9);
+ ctx.quadraticCurveTo(30,5,10,-9);
+ ctx.closePath();
+ ctx.fill();
+
+ ctx.fillStyle="#dce5ed";
+ ctx.fillRect(16,-8,30,9);
+
+ ctx.restore();
+}
+
+function draw(){
+ drawCity();
+
+ for(const o of obstacles)drawToilet(o);
+ if(player)drawPlayer();
+
+ updateUI();
+}
+
+function endGame(){
+ running=false;
+ showMenu(true);
+}
+
+function loop(time){
+ if(!running)return;
+
+ const dt=Math.min((time-lastTime)/16.67,2);
+ lastTime=time;
+ frame+=dt;
+
+ speed=Math.min(Math.max(5,W/150)+score*.12,W/65);
+
+ // Fizyka
+ player.vy+=.8*dt;
+ player.y+=player.vy*dt;
+
+ if(player.y>=ground-player.h){
+  player.y=ground-player.h;
+  player.vy=0;
+  player.grounded=true;
+ }
+
+ // Tworzenie przeszkód
+ spawnTimer-=dt;
+
+ if(spawnTimer<=0){
+  obstacles.push({x:W+30,counted:false});
+  spawnTimer=75+Math.random()*35;
+ }
+
+ for(const o of obstacles){
+  o.x-=speed*dt;
+
+  if(!o.counted&&o.x+55<player.x){
+   o.counted=true;
+   score++;
+
+   if(score>best){
+    best=score;
+    try{
+     localStorage.setItem("toaletowyRekord",String(best));
+    }catch(e){}
+   }
+  }
+ }
+
+ obstacles=obstacles.filter(o=>o.x>-100);
+
+ // Kolizja
+ const ps=Math.max(.7,Math.min(1.2,H/420));
+
+ for(const o of obstacles){
+  const px=player.x+6*ps;
+  const py=player.y+8*ps;
+
+  if(
+   px+30*ps>o.x+5*ps&&
+   px<o.x+53*ps&&
+   py+53*ps>ground-53*ps&&
+   py<ground
+  ){
+   draw();
+   endGame();
+   return;
+  }
+ }
+
+ draw();
+ animationId=requestAnimationFrame(loop);
+}
+
+// Start
+resize();
+showMenu();
+draw();
+
+</script>
+</body>
+</html>
